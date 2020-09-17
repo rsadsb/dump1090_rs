@@ -16,9 +16,9 @@ use std::sync::Mutex;
 use byteorder::{BigEndian, ReadBytesExt};
 use clap::{Arg, App};
 
-use dump1090_rs::{MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
+use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
 
-fn main() {
+fn main() -> Result<(), &'static str> {
 
 	let matches = App::new("Rust dump1090")
 		.version("0.1.0")
@@ -26,7 +26,7 @@ fn main() {
 		.about("Translation of dump1090-mutability into Rust, intended to match bit-for-bit")
 		.arg(Arg::with_name("ifile").long("ifile")
 			.help("Read data from file")
-			.required(true).takes_value(true))
+			.required(false).takes_value(true))
 		.arg(Arg::with_name("throttle").long("throttle")
 			.help("When reading from a file, play back in realtime, not at max speed")
 			.required(false).takes_value(false))
@@ -44,7 +44,31 @@ fn main() {
 
 	} else {
 
-		panic!("Reading directly from RTLSDR not yet implemented");
+		let mut dev = rtlsdr::RtlSdrDevice::new(0)?;
+
+		let available_gains = dev.get_tuner_gains()?;
+		eprintln!("Available gains: {:?}", available_gains);
+
+		let max_gain:i32 = *(available_gains.iter().max().unwrap());
+		eprintln!("Max available gain: {:.1} [dB]", (max_gain as f32) * 0.1);
+
+		dev.set_tuner_gain_mode(1)?;
+		dev.set_tuner_gain(max_gain)?;
+		if let Err(_) = dev.set_freq_correction(0) {
+			// For some reason, this function returns -2 when we set the frequency correction to 0
+			// The same thing happens in dump1090, but the return value is never checked
+			eprintln!("Warning: Nonzero return value from set_freq_correction");
+		}
+		dev.set_center_freq(1090_000_000)?;
+		dev.set_sample_rate(2400000)?;
+
+		eprintln!("Set center freq to {:.4e} [Hz]", dev.get_center_freq()?);
+		eprintln!("Set freq correction to {} [ppm]", dev.get_freq_correction()?);
+		eprintln!("Set tuner gain to {:.1} [dB]", (dev.get_tuner_gain()? as f32) * 0.1);
+		eprintln!("Set sample rate to {}", dev.get_sample_rate()?);
+
+		dev.reset_buffer()?;
+		Box::new(dev)
 
 	};
 
@@ -87,5 +111,7 @@ fn main() {
 		}
 
 	}
+
+	Ok(())
 
 }

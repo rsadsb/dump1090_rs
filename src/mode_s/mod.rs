@@ -223,15 +223,15 @@ fn df_to_string(df:u8) -> &'static str { match df {
 pub fn display_mode_s_message(mm:&ModeSMessage) {
     // Show the raw message.
     print!("*");
-    eprint!("*");
+    // eprint!("*");
 
     for j in 0..(mm.msgbits/8) { 
         print!("{:02x}", mm.msg[j]); 
-        eprint!("{:02x}", mm.msg[j]); 
+        // eprint!("{:02x}", mm.msg[j]); 
     }
     
     print!(";\n");
-    eprint!(";\n");
+    // eprint!(";\n");
 
     if mm.msgtype < 32 { println!("CRC: {:06x}", mm.crc); }
 
