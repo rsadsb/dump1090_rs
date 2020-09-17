@@ -203,22 +203,6 @@ impl RtlSdrDevice {
 		}
 	}
 
-	pub fn read_sync(&mut self) -> Result<Vec<u8>, &'static str> {
-		let mut n_read:isize = 0;
-		let mut rcv_buff:Vec<u8> = vec![0u8; 512];
-
-		let result_code = unsafe {	
-			rtlsdr_read_sync(self.dev, &mut rcv_buff[0], 512, &mut n_read)
-		};
-
-		rcv_buff.truncate(n_read as usize);
-
-		match result_code {
-			0 => Ok(rcv_buff),
-			_ => Err("Failure to read bytes")
-		}
-	}
-
 }
 
 impl std::ops::Drop for RtlSdrDevice {
@@ -228,6 +212,25 @@ impl std::ops::Drop for RtlSdrDevice {
 			rtlsdr_close(self.dev);
 		}
 	}
+}
+
+impl std::io::Read for RtlSdrDevice {
+	
+	fn read(&mut self, buf:&mut [u8]) -> std::io::Result<usize> {
+		// Reading back a negative number of bytes doesn't make sense but it looks 
+		// like the RTLSDR API expects a signed integer regardless
+		let mut n_read:isize = 0;
+		
+		let result_code = unsafe {	
+			rtlsdr_read_sync(self.dev, &mut buf[0], buf.len() as isize, &mut n_read)
+		};
+
+		match result_code {
+			0 => Ok(n_read as usize),
+			_ => Err(std::io::Error::new(std::io::ErrorKind::Other, "Unable to read from RTL-SDR"))
+		}
+	}
+
 }
 
 #[derive(Debug)]

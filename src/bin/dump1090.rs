@@ -32,14 +32,23 @@ fn main() {
 			.required(false).takes_value(false))
 		.get_matches();
 
-	let fname:&str = matches.value_of("ifile").unwrap();
-	let mut f = File::open(fname).unwrap();
 	let mut f_buffer:[u8; 2*MODES_MAG_BUF_SAMPLES] = [0u8; 2*MODES_MAG_BUF_SAMPLES];
+	let mut active:bool = true;
 
 	let fs:usize = 2400000;
-	eprintln!("Unused argument {:?}", matches.value_of("throttle"));
 
-	let mut active:bool = true;
+	let mut src:Box<dyn std::io::Read> = if let Some(fname) = matches.value_of("ifile") {
+		
+		let f = File::open(fname).unwrap();
+		Box::new(f)
+
+	} else {
+
+		panic!("Reading directly from RTLSDR not yet implemented");
+
+	};
+
+	// TODO: Use the throttle argument
 
 	while active {
 
@@ -49,7 +58,7 @@ fn main() {
 
 			let mut total_power_u64:u64 = 0;
 
-			let read_result = f.read(&mut f_buffer);
+			let read_result = src.read(&mut f_buffer);
 			match read_result {
 				Err(_) => active = false,
 				Ok(0)  => active = false,
