@@ -1,8 +1,5 @@
 
-/* aviation::adsb::dump1090::icao_filter
-
-This module includes functionality translated from icao_filter.c
-*/
+//This module includes functionality translated from icao_filter.c
 
 use std::sync::Mutex;
 

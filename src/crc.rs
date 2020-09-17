@@ -1,8 +1,5 @@
 
-/* aviation::adsb::dump1090::mode_s
-
-This module includes functionality translated from mode_s.c
-*/
+//This module includes functionality translated from mode_s.c
 
 pub const CRC_TABLE:[u32; 256] = [0x00000000, 0x00FFF409, 0x00001C1B, 0x00FFE812, 0x00003836, 0x00FFCC3F, 0x0000242D, 0x00FFD024, 
 								  0x0000706C, 0x00FF8465, 0x00006C77, 0x00FF987E, 0x0000485A, 0x00FFBC53, 0x00005441, 0x00FFA048, 

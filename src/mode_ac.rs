@@ -1,8 +1,5 @@
 
-/* aviation::adsb::dump1090::mode_ac
-
-This module includes functionality translated from mode_ac.c
-*/
+//This module includes functionality translated from mode_ac.c
 
 pub fn mode_a_to_mode_c(mode_a:u32) -> Result<u32, &'static str> {
 	let mut five_hundreds:u32 = 0;

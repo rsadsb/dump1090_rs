@@ -199,8 +199,7 @@ impl Aircraft {
 
 }
 
-// TODO: consider putting inside the Aircraft impl block; also, try for a more idiomatic represention rather than
-// a more literal translation once I figure out what's going on a little better (use a Result return type for one thing)
+// TODO: consider putting inside the Aircraft impl block
 fn do_global_cpr(a:&mut Aircraft, mm:&ModeSMessage, now_ms:u128, lat:&mut f64, lon:&mut f64, nuc:&mut u32) -> i32 {
     // TODO: as always, try to get rid of unwraps at some point
     let (_, _, fflag, _, mm_cpr_type) = mm.raw_cpr.unwrap();

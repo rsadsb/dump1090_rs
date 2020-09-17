@@ -28,6 +28,8 @@ pub fn demodulate2400(mag:&MagnitudeBuffer, fs:usize) -> Result<(), &'static str
 
     let data = &mag.data;
 
+    // I'm not actually using the sample rate.  I just wanted to have the caller confirm that
+    // this is the sample rate we expect.  The C code doesn't do this and I might reconsider it later
 	if fs != 2400000 { return Err("2.4e6 [samples/sec] is the only sample rate supported"); }
 
     let mut skip_count:usize = 0;

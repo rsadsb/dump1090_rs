@@ -14,7 +14,7 @@ pub const MAGIC_MLAT_TIMESTAMP:usize = 0xFF004D4C4154;
 // Navigation Uncertainty Category (NUC)
 pub struct Position { lat_deg:f64, lon_deg:f64, nuc:u32 }
 
-// Private modules just to break up this file
+// Private module just to break up this file
 mod decode;
 
 // mode_s.c:77
