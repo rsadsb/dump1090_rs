@@ -7,7 +7,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install rtl-sdr
+      - run: sudo apt-get install librtlsdr-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -23,7 +23,7 @@ jobs:
     name: Build Examples
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install rtl-sdr
+      - run: sudo apt-get install librtlsdr-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -39,7 +39,7 @@ jobs:
     name: Test Suite
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install rtl-sdr
+      - run: sudo apt-get install librtlsdr-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -55,7 +55,7 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install rtl-sdr
+      - run: sudo apt-get install librtlsdr-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -72,7 +72,7 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install rtl-sdr
+      - run: sudo apt-get install librtlsdr-dev
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
