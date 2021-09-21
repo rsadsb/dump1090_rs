@@ -1,15 +1,16 @@
 # dump1090_rs
-A Rust translation of the dump1090 project.  This project brings this popular and well-tested algorithm to the Rust world.  It's implemented as a library crate with one binary.  It also comes with an (incomplete) Rust interface wrapped around the RTL-SDR API, so you can always import this library into your crate and use its RTL-SDR interface even if you're interested in a different band than 1090 MHz.
 
-## Quickstart
-Just plug in your RTL-SDR and type `cargo run --bin dump1090`.  For more options, build the binary and use `dump1090 --help`.  The options right now basically just allow you to either read directly from the RTL-SDR or from a prerecorded binary file, but more will be added later.
+Fork of https://github.com/johnwstanford/dump1090_rs, without parsing messages.
+This project is meant to just forward bytes from the the demodulated iq to our own [adsb_deku](https://github.com/wcampbell0x2a/adsb_deku)
 
-## Design Details
-This is meant to be a literal translation based on commit b155fdb of https://github.com/adsbxchange/dump1090-mutability.  By "literal", I mean that the output is expected to match bit-for-bit in almost all cases.  This includes a few instances of (what I think are) bugs.  The original code uses system timestamps on Mode S messages, whereas I use a timestamp based on the sample count.  The system timestamps are, of course, not deterministic, so this makes direct bit-for-bit comparison hard.  Using the `--throttle` command line argument should theoretically alleviate this problem, but not always.  I also think there's a bug in the way trailing samples are rolled over to the next buffer and I recreated it even though I don't think it's right because I wanted to be able to compare everything downstream.  I'm also not translating boilerplate code for interactive mode, TCP/IP interfaces, are stuff like that.  I'm just interested in the logic that's unique to this project.  There are plenty of crates that make this kind of stuff really easy.
+# Usage
 
-The speed is similar to the C version on all the computers I've tried (within about 10% of each other when inputting a pre-recorded binary file).  Both are much faster than real-time, even on relatively lightweight computers like a MacBook Air.  I haven't tried a Raspberry Pi yet.  The current binary is completely single-threaded and there might be some performance gains to be had using crates like `tokio` but as I said, it's already plenty fast enough even single-threaded and using blocking functions.
+```
+cargo r
+```
 
-I used idiomatic Rust (such as pattern matching) where it was easy to do, but the code still looks a lot like C in many places (such as using integer return types where Rust would prefer a `Result`).  This is because I wanted to keep it easy to put the Rust code next to the C code and see a one-to-one comparison.  Taking the idiomatic Rust much further would have made this hard.  In the future, I might try a clean-sheet Rust 1090 demodulator but it'll probably be a different repo.
+# Changes
+- Removed packet parsing functions
+- Removed read in from file
+- Added TCP forwarding to client
 
-## How to Help
-There are also several cases where branches of execution are commented out and/or end in a `panic!`.  This is because these are rarely-used paths that I'd like to implement at some point, but they're lower priority.  I tested this version of the code for several hours in the busy airspace around DFW airport and never found cases where these branches get used.  Not only are these branches rarely used, but I also can't really test them without data.  If you find cases where these `panic!`s occur, it would be a big help if you could send me an RTLSDR binary dump I can use to test.
