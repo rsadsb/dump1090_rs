@@ -97,10 +97,17 @@ fn main() -> Result<(), &'static str> {
 
             let resulting_data = dump1090_rs::demod_2400::demodulate2400(outbuf).unwrap();
             if !resulting_data.is_empty() {
-                println!("{:02x?}", resulting_data);
+                println!("{:x?}", resulting_data);
+                let resulting_data: Vec<String> = resulting_data
+                    .iter()
+                    .map(|a| {
+                        let a = hex::encode(a);
+                        format!("*{};\n", a)
+                    })
+                    .collect();
                 for mut socket in &sockets {
                     for msg in &resulting_data {
-                        socket.write_all(msg).unwrap();
+                        socket.write_all(msg.as_bytes()).unwrap();
                     }
                 }
             }
