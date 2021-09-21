@@ -4,7 +4,7 @@ use std::f64::consts::PI;
 use std::sync::Mutex;
 
 use crate::ModeSMessage;
-use crate::{AddrType, AltitudeSource, DataSource, HeadingSource, SpeedSource};
+use crate::{AltitudeSource, DataSource, HeadingSource, SpeedSource};
 use crate::{
     MODEAC_MSG_FLAG, MODEAC_MSG_MODEA_HIT, MODEAC_MSG_MODEA_ONLY, MODEAC_MSG_MODEC_HIT,
     MODEAC_MSG_MODEC_OLD,
@@ -97,7 +97,7 @@ impl<T: Default> DataValidityBox<T> {
             return None;
         }
 
-        self.source = source.clone();
+        self.source = *source;
         self.updated = now_ms;
         self.stale = now_ms + 60000;
         self.expires = now_ms + 70000;
@@ -182,13 +182,19 @@ fn greatcircle(lat0_deg: f64, lon0_deg: f64, lat1_deg: f64, lon1_deg: f64) -> f6
 
     // use haversine for small distances for better numerical stability
     if dlat < 0.001 && dlon < 0.001 {
-        let a = (dlat / 2.0).sin() * (dlat / 2.0).sin()
-            + lat0.cos() * lat1.cos() * (dlon / 2.0).sin() * (dlon / 2.0).sin();
+        let a = (dlat / 2.0).sin().mul_add(
+            (dlat / 2.0).sin(),
+            lat0.cos() * lat1.cos() * (dlon / 2.0).sin() * (dlon / 2.0).sin(),
+        );
         return 6371.0e3 * 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
     }
 
     // spherical law of cosines
-    6371.0e3 * (lat0.sin() * lat1.sin() + lat0.cos() * lat1.cos() * dlon.cos()).acos()
+    6371.0e3
+        * lat0
+            .sin()
+            .mul_add(lat1.sin(), lat0.cos() * lat1.cos() * dlon.cos())
+            .acos()
 }
 
 // track.c:520
@@ -199,12 +205,12 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
 
     // Lookup our aircraft or create a new one
     if let Ok(mut aircraft_list) = AIRCRAFT_LIST.lock() {
-        let need_new_entry: bool = aircraft_list.iter().find(|a| a.addr.0 == mm.addr).is_none();
+        let need_new_entry: bool = !aircraft_list.iter().any(|a| a.addr.0 == mm.addr);
         if need_new_entry {
             // track.c: 59
             let mut aircraft = aircraft::Aircraft::default();
 
-            aircraft.addr = (mm.addr, mm.addrtype.clone().unwrap_or(AddrType::default()));
+            aircraft.addr = (mm.addr, mm.addrtype.clone().unwrap_or_default());
 
             // start off with the "last emitted" ACAS RA being blank (just the BDS 3,0
             // or ES type code)
@@ -216,7 +222,7 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
             // time this ModeA/C is received again in the future
             if mm.msgtype == 32 {
                 aircraft.mode_ac_flags = MODEAC_MSG_FLAG;
-                if let None = mm.altitude {
+                if mm.altitude.is_none() {
                     aircraft.mode_ac_flags |= MODEAC_MSG_MODEA_ONLY;
                 }
             }
@@ -254,7 +260,7 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
         };
 
         if let Some((_mm_altitude, _, AltitudeSource::Baro)) = mm.altitude {
-            let reset_mode_c_count: Option<bool> = a.altitude.update(&mm, now_ms, |alt_tuple| {
+            let reset_mode_c_count: Option<bool> = a.altitude.update(mm, now_ms, |alt_tuple| {
                 let (alt, alt_mode_c) = alt_tuple;
                 let mode_c = (*alt as u32 + 49) / 100;
 
@@ -274,7 +280,7 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
         }
 
         if let Some(mm_squawk) = mm.squawk {
-            let reset_mode_a_count: Option<bool> = a.squawk.update(&mm, now_ms, |squawk| {
+            let reset_mode_a_count: Option<bool> = a.squawk.update(mm, now_ms, |squawk| {
                 let ans: bool = *squawk != mm_squawk;
 
                 *squawk = mm_squawk;
@@ -289,31 +295,31 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
         }
 
         if let Some((mm_alt, _, AltitudeSource::GNSS)) = mm.altitude {
-            a.altitude_gnss.update(&mm, now_ms, |alt| *alt = mm_alt);
+            a.altitude_gnss.update(mm, now_ms, |alt| *alt = mm_alt);
         }
 
         a.gnss_delta
-            .opt_fn_update(&mm, now_ms, &mm.gnss_delta, |x| *x);
+            .opt_fn_update(mm, now_ms, &mm.gnss_delta, |x| *x);
 
         match mm.heading {
             Some((mm_hdg, HeadingSource::True)) => {
-                a.heading.update(&mm, now_ms, |hdg| *hdg = mm_hdg);
+                a.heading.update(mm, now_ms, |hdg| *hdg = mm_hdg);
             }
             Some((mm_hdg, HeadingSource::Magnetic)) => {
-                a.heading_magnetic.update(&mm, now_ms, |hdg| *hdg = mm_hdg);
+                a.heading_magnetic.update(mm, now_ms, |hdg| *hdg = mm_hdg);
             }
             _ => (),
         }
 
         match mm.speed {
             Some((mm_spd, SpeedSource::GroundSpeed)) => {
-                a.speed.update(&mm, now_ms, |spd| *spd = mm_spd);
+                a.speed.update(mm, now_ms, |spd| *spd = mm_spd);
             }
             Some((mm_spd, SpeedSource::IAS)) => {
-                a.speed_ias.update(&mm, now_ms, |spd| *spd = mm_spd);
+                a.speed_ias.update(mm, now_ms, |spd| *spd = mm_spd);
             }
             Some((mm_spd, SpeedSource::TAS)) => {
-                a.speed_tas.update(&mm, now_ms, |spd| *spd = mm_spd);
+                a.speed_tas.update(mm, now_ms, |spd| *spd = mm_spd);
             }
             _ => (),
         }
@@ -323,20 +329,19 @@ pub fn update_from_message(mm: &mut ModeSMessage) {
         // Cloning and/or copying is what we want here because the Aircraft struct is
         // going to live longer than the ModeSMessage
         a.vert_rate
-            .opt_fn_update(&mm, now_ms, &mm.vert_rate, |x| x.clone());
-        a.category.opt_fn_update(&mm, now_ms, &mm.category, |x| *x);
-        a.airground
-            .opt_fn_update(&mm, now_ms, &mm.airground, |x| *x);
+            .opt_fn_update(mm, now_ms, &mm.vert_rate, std::clone::Clone::clone);
+        a.category.opt_fn_update(mm, now_ms, &mm.category, |x| *x);
+        a.airground.opt_fn_update(mm, now_ms, &mm.airground, |x| *x);
         a.callsign
-            .opt_fn_update(&mm, now_ms, &mm.callsign, |x| x.clone());
+            .opt_fn_update(mm, now_ms, &mm.callsign, std::clone::Clone::clone);
 
         if let Some((mm_cpr_lat, mm_cpr_lon, mm_cpr_odd, mm_cpr_nucp, mm_cpr_type)) = mm.raw_cpr {
             if mm_cpr_odd {
-                a.cpr_odd.update(&mm, now_ms, |x| {
+                a.cpr_odd.update(mm, now_ms, |x| {
                     *x = (mm_cpr_type, mm_cpr_lat, mm_cpr_lon, mm_cpr_nucp)
                 });
             } else {
-                a.cpr_even.update(&mm, now_ms, |x| {
+                a.cpr_even.update(mm, now_ms, |x| {
                     *x = (mm_cpr_type, mm_cpr_lat, mm_cpr_lon, mm_cpr_nucp)
                 });
             }

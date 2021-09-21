@@ -1,26 +1,26 @@
 // This module includes functionality translated from demod_2400.c
 
 use crate::mode_s;
-use crate::{MagnitudeBuffer, ModeSMessage, MODES_LONG_MSG_BYTES};
+use crate::{MagnitudeBuffer, MODES_LONG_MSG_BYTES};
 
 fn slice_phase0(m: &[u16]) -> i32 {
-    5 * (m[0] as i32) - 3 * (m[1] as i32) - 2 * (m[2] as i32)
+    5 * i32::from(m[0]) - 3 * i32::from(m[1]) - 2 * i32::from(m[2])
 }
 
 fn slice_phase1(m: &[u16]) -> i32 {
-    4 * (m[0] as i32) - (m[1] as i32) - 3 * (m[2] as i32)
+    4 * i32::from(m[0]) - i32::from(m[1]) - 3 * i32::from(m[2])
 }
 
 fn slice_phase2(m: &[u16]) -> i32 {
-    3 * (m[0] as i32) + (m[1] as i32) - 4 * (m[2] as i32)
+    3 * i32::from(m[0]) + i32::from(m[1]) - 4 * i32::from(m[2])
 }
 
 fn slice_phase3(m: &[u16]) -> i32 {
-    2 * (m[0] as i32) + 3 * (m[1] as i32) - 5 * (m[2] as i32)
+    2 * i32::from(m[0]) + 3 * i32::from(m[1]) - 5 * i32::from(m[2])
 }
 
 fn slice_phase4(m: &[u16]) -> i32 {
-    (m[0] as i32) + 5 * (m[1] as i32) - 5 * (m[2] as i32) - (m[3] as i32)
+    i32::from(m[0]) + 5 * i32::from(m[1]) - 5 * i32::from(m[2]) - i32::from(m[3])
 }
 
 pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static str> {
@@ -45,25 +45,25 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             }
 
             // Check that the "quiet" bits 6,7,15,16,17 are actually quiet
-            if data[j + 5] as i32 >= high
-                || data[j + 6] as i32 >= high
-                || data[j + 7] as i32 >= high
-                || data[j + 8] as i32 >= high
-                || data[j + 14] as i32 >= high
-                || data[j + 15] as i32 >= high
-                || data[j + 16] as i32 >= high
-                || data[j + 17] as i32 >= high
-                || data[j + 18] as i32 >= high
+            if i32::from(data[j + 5]) >= high
+                || i32::from(data[j + 6]) >= high
+                || i32::from(data[j + 7]) >= high
+                || i32::from(data[j + 8]) >= high
+                || i32::from(data[j + 14]) >= high
+                || i32::from(data[j + 15]) >= high
+                || i32::from(data[j + 16]) >= high
+                || i32::from(data[j + 17]) >= high
+                || i32::from(data[j + 18]) >= high
             {
                 continue 'jloop;
             }
 
             // Try all phases
-            let mut bestmsg: [u8; MODES_LONG_MSG_BYTES] = [0u8; MODES_LONG_MSG_BYTES];
+            let mut bestmsg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
             let mut bestscore: i32 = -2;
             let mut bestphase: usize = 0;
 
-            let mut msg: [u8; MODES_LONG_MSG_BYTES] = [0u8; MODES_LONG_MSG_BYTES];
+            let mut msg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
             for try_phase in 4..9 {
                 let mut slice_loc: usize = j + 19 + (try_phase / 5);
                 let mut phase: usize = try_phase % 5;
@@ -333,14 +333,14 @@ fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     {
         // 11-12
         // peaks at 1,3,9,11-12: phase 3
-        let high = (preamble[1] as i32
-            + preamble[3] as i32
-            + preamble[9] as i32
-            + preamble[11] as i32
-            + preamble[12] as i32)
+        let high = (i32::from(preamble[1])
+            + i32::from(preamble[3])
+            + i32::from(preamble[9])
+            + i32::from(preamble[11])
+            + i32::from(preamble[12]))
             / 4;
-        let base_signal = preamble[1] as u32 + preamble[3] as u32 + preamble[9] as u32;
-        let base_noise = preamble[5] as u32 + preamble[6] as u32 + preamble[7] as u32;
+        let base_signal = u32::from(preamble[1]) + u32::from(preamble[3]) + u32::from(preamble[9]);
+        let base_noise = u32::from(preamble[5]) + u32::from(preamble[6]) + u32::from(preamble[7]);
         Some((high, base_signal, base_noise))
     } else if preamble[1] > preamble[2] &&                                // 1
               preamble[2] < preamble[3] && preamble[3] > preamble[4] &&   // 3
@@ -349,13 +349,19 @@ fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     {
         // 12
         // peaks at 1,3,9,12: phase 4
-        let high =
-            (preamble[1] as i32 + preamble[3] as i32 + preamble[9] as i32 + preamble[12] as i32)
-                / 4;
-        let base_signal =
-            preamble[1] as u32 + preamble[3] as u32 + preamble[9] as u32 + preamble[12] as u32;
-        let base_noise =
-            preamble[5] as u32 + preamble[6] as u32 + preamble[7] as u32 + preamble[8] as u32;
+        let high = (i32::from(preamble[1])
+            + i32::from(preamble[3])
+            + i32::from(preamble[9])
+            + i32::from(preamble[12]))
+            / 4;
+        let base_signal = u32::from(preamble[1])
+            + u32::from(preamble[3])
+            + u32::from(preamble[9])
+            + u32::from(preamble[12]);
+        let base_noise = u32::from(preamble[5])
+            + u32::from(preamble[6])
+            + u32::from(preamble[7])
+            + u32::from(preamble[8]);
         Some((high, base_signal, base_noise))
     } else if preamble[1] > preamble[2] &&                                // 1
               preamble[2] < preamble[3] && preamble[4] > preamble[5] &&   // 3-4
@@ -364,15 +370,15 @@ fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     {
         // 12
         // peaks at 1,3-4,9-10,12: phase 5
-        let high = (preamble[1] as i32
-            + preamble[3] as i32
-            + preamble[4] as i32
-            + preamble[9] as i32
-            + preamble[10] as i32
-            + preamble[12] as i32)
+        let high = (i32::from(preamble[1])
+            + i32::from(preamble[3])
+            + i32::from(preamble[4])
+            + i32::from(preamble[9])
+            + i32::from(preamble[10])
+            + i32::from(preamble[12]))
             / 4;
-        let base_signal = preamble[1] as u32 + preamble[12] as u32;
-        let base_noise = preamble[6] as u32 + preamble[7] as u32;
+        let base_signal = u32::from(preamble[1]) + u32::from(preamble[12]);
+        let base_noise = u32::from(preamble[6]) + u32::from(preamble[7]);
         Some((high, base_signal, base_noise))
     } else if preamble[1] > preamble[2] &&                                 // 1
               preamble[3] < preamble[4] && preamble[4] > preamble[5] &&    // 4
@@ -381,13 +387,19 @@ fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     {
         // 12
         // peaks at 1,4,10,12: phase 6
-        let high =
-            (preamble[1] as i32 + preamble[4] as i32 + preamble[10] as i32 + preamble[12] as i32)
-                / 4;
-        let base_signal =
-            preamble[1] as u32 + preamble[4] as u32 + preamble[10] as u32 + preamble[12] as u32;
-        let base_noise =
-            preamble[5] as u32 + preamble[6] as u32 + preamble[7] as u32 + preamble[8] as u32;
+        let high = (i32::from(preamble[1])
+            + i32::from(preamble[4])
+            + i32::from(preamble[10])
+            + i32::from(preamble[12]))
+            / 4;
+        let base_signal = u32::from(preamble[1])
+            + u32::from(preamble[4])
+            + u32::from(preamble[10])
+            + u32::from(preamble[12]);
+        let base_noise = u32::from(preamble[5])
+            + u32::from(preamble[6])
+            + u32::from(preamble[7])
+            + u32::from(preamble[8]);
         Some((high, base_signal, base_noise))
     } else if preamble[2] > preamble[3] &&                                 // 1-2
               preamble[3] < preamble[4] && preamble[4] > preamble[5] &&    // 4
@@ -396,14 +408,15 @@ fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     {
         // 12
         // peaks at 1-2,4,10,12: phase 7
-        let high = (preamble[1] as i32
-            + preamble[2] as i32
-            + preamble[4] as i32
-            + preamble[10] as i32
-            + preamble[12] as i32)
+        let high = (i32::from(preamble[1])
+            + i32::from(preamble[2])
+            + i32::from(preamble[4])
+            + i32::from(preamble[10])
+            + i32::from(preamble[12]))
             / 4;
-        let base_signal = preamble[4] as u32 + preamble[10] as u32 + preamble[12] as u32;
-        let base_noise = preamble[6] as u32 + preamble[7] as u32 + preamble[8] as u32;
+        let base_signal =
+            u32::from(preamble[4]) + u32::from(preamble[10]) + u32::from(preamble[12]);
+        let base_noise = u32::from(preamble[6]) + u32::from(preamble[7]) + u32::from(preamble[8]);
         Some((high, base_signal, base_noise))
     } else {
         None
