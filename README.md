@@ -7,7 +7,7 @@ This project is meant to just forward bytes from the the demodulated iq to our o
 # Usage
 
 ```
-cargo r
+cargo r --release
 ```
 
 # Changes
