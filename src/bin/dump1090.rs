@@ -18,7 +18,7 @@ use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
 
 fn main() -> Result<(), &'static str> {
     let _matches = App::new("Rust dump1090")
-        .version("0.1.0")
+        .version(clap::crate_version!())
         .author("John Stanford (johnwstanford@gmail.com)")
         .about("Translation of dump1090-mutability into Rust, intended to match bit-for-bit");
 
