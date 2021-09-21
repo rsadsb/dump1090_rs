@@ -11,33 +11,20 @@ timing, and things like that might give results that are not quite identical.
 #[macro_use]
 extern crate lazy_static;
 
-pub mod cpr;
-pub mod crc;
+// public
 pub mod demod_2400;
-pub mod icao_filter;
-pub mod mode_ac;
-pub mod mode_s;
 pub mod rtlsdr;
-pub mod track;
+
+// private
+mod crc;
+mod icao_filter;
+mod mode_s;
 
 pub const MODES_MAG_BUF_SAMPLES: usize = 131_072;
 
-// dump1090.h:101
-pub const MODEAC_MSG_SAMPLES: u32 = 50; // include up to the SPI bit
-pub const MODEAC_MSG_BYTES: u32 = 2;
-pub const MODEAC_MSG_SQUELCH_LEVEL: u32 = 0x07FF; // Average signal strength limit
-pub const MODEAC_MSG_FLAG: u32 = 1;
-pub const MODEAC_MSG_MODES_HIT: u32 = 2;
-pub const MODEAC_MSG_MODEA_HIT: u32 = 4;
-pub const MODEAC_MSG_MODEC_HIT: u32 = 8;
-pub const MODEAC_MSG_MODEA_ONLY: u32 = 16;
-pub const MODEAC_MSG_MODEC_OLD: u32 = 32;
-
-pub const TRAILING_SAMPLES: usize = 326;
-pub const MODES_LONG_MSG_BYTES: usize = 14;
-pub const MODES_SHORT_MSG_BYTES: usize = 7;
-
-pub const MODES_NON_ICAO_ADDRESS: u32 = 16_777_216;
+const TRAILING_SAMPLES: usize = 326;
+const MODES_LONG_MSG_BYTES: usize = 14;
+const MODES_SHORT_MSG_BYTES: usize = 7;
 
 lazy_static! {
     pub static ref MAG_LUT: Vec<u16> = {
@@ -63,128 +50,6 @@ lazy_static! {
 
         ans
     };
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DataSource {
-    Invalid,
-    MLAT,
-    ModeS,
-    ModeSChecked,
-    TISB,
-    ADSB,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AddrType {
-    ADSB_ICAO,
-    ADSB_ICAO_NT,
-    ADSR_ICAO,
-    TISB_ICAO,
-    ADSB_Other,
-    ADSR_Other,
-    TISB_Trackfile,
-    TISB_Other,
-    Unknown,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum AltitudeUnit {
-    Feet,
-    Meters,
-}
-
-#[derive(Debug, Clone)] // dump1090.h:170
-pub enum AltitudeSource {
-    Baro,
-    GNSS,
-}
-
-#[derive(Debug, Clone, Copy)] // dump1090.h:175
-pub enum AirGround {
-    Invalid,
-    Ground,
-    Airborne,
-    Uncertain,
-}
-
-#[derive(Debug, Clone)] // dump1090.h:182
-pub enum SpeedSource {
-    GroundSpeed,
-    IAS,
-    TAS,
-}
-
-#[derive(Debug, Clone)]
-pub enum HeadingSource {
-    True,
-    Magnetic,
-}
-
-#[derive(Debug, Clone)]
-pub enum SilType {
-    SilPerSample,
-    SilPerHour,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CprType {
-    Surface,
-    Airborne,
-    Coarse,
-}
-
-#[derive(Debug, Clone)]
-pub enum TssAltitudeType {
-    MCP,
-    FMS,
-}
-
-#[derive(Debug, Clone)]
-pub enum AngleType {
-    Track,
-    Heading,
-}
-
-impl Default for AddrType {
-    fn default() -> Self {
-        Self::Unknown
-    }
-}
-impl Default for AirGround {
-    fn default() -> Self {
-        Self::Uncertain
-    }
-}
-impl Default for AltitudeSource {
-    fn default() -> Self {
-        Self::Baro
-    }
-}
-impl Default for CprType {
-    fn default() -> Self {
-        Self::Coarse
-    }
-}
-impl Default for DataSource {
-    fn default() -> Self {
-        Self::Invalid
-    }
-}
-impl Default for HeadingSource {
-    fn default() -> Self {
-        Self::True
-    }
-}
-impl Default for SilType {
-    fn default() -> Self {
-        Self::SilPerSample
-    }
-}
-impl Default for AngleType {
-    fn default() -> Self {
-        Self::Track
-    }
 }
 
 // dump1090.h:252
@@ -256,113 +121,4 @@ impl Modes {
             &mut self.mag_buffer_b
         }
     }
-}
-
-#[derive(Debug, Default, Clone)] // dump1090.h:380
-pub struct ModeSMessage {
-    pub msg: Vec<u8>,
-    pub msgbits: usize,
-    pub msgtype: u8,
-    pub crc: u32,
-    pub addr: u32,
-    pub addrtype: Option<AddrType>,
-    pub timestamp_msg: usize,
-    pub remote: bool,
-    pub signal_level: f64,
-    pub score: i32,
-    pub source: DataSource,
-
-    // Raw data
-    pub iid: u32,
-    pub aa: u32,
-    pub ac: u32,
-    pub ca: u32,
-    pub cc: u32,
-    pub cf: u32,
-    pub dr: u32,
-    pub fs: u32,
-    pub id: u32,
-    pub ke: u32,
-    pub nd: u32,
-    pub ri: u32,
-    pub sl: u32,
-    pub um: u32,
-    pub vs: u32,
-    pub mb: [u8; 7],
-    pub md: [u8; 10],
-    pub me: [u8; 7],
-    pub mv: [u8; 7],
-
-    // Decoded data
-    pub metype: u8,
-    pub mesub: u8,
-
-    pub altitude: Option<(i32, AltitudeUnit, AltitudeSource)>,
-    pub gnss_delta: Option<i32>,
-    pub heading: Option<(i32, HeadingSource)>,
-    pub speed: Option<(u32, SpeedSource)>,
-    pub vert_rate: Option<(i32, AltitudeSource)>,
-    pub squawk: Option<u32>,
-    pub callsign: Option<String>,
-    pub category: Option<u8>,
-    pub raw_cpr: Option<(u32, u32, bool, u32, CprType)>,
-    pub decoded_cpr: Option<(f64, f64, bool)>,
-    pub airground: Option<AirGround>,
-
-    pub tss: Option<TargetStateStatus>,
-    pub opstatus: Option<OperationalStatus>,
-}
-
-#[derive(Debug, Clone)]
-pub struct TargetStateStatus {
-    pub mode_valid: bool,
-    pub mode_autopilot: bool,
-    pub mode_vnav: bool,
-    pub mode_alt_hold: bool,
-    pub mode_approach: bool,
-    pub acas_operational: bool,
-    pub nac_p: u8,
-    pub nic_baro: bool,
-    pub sil: u8,
-    pub sil_type: SilType,
-    pub altitude: Option<(u32, TssAltitudeType)>,
-    pub baro: Option<f32>,
-    pub heading: Option<u32>,
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct OperationalStatus {
-    pub version: u8,
-
-    pub om_acas_ra: bool,
-    pub om_ident: bool,
-    pub om_atc: bool,
-    pub om_saf: bool,
-
-    pub om_sda: u8,
-    pub cc_acas: bool,
-    pub cc_cdti: bool,
-    pub cc_1090_in: bool,
-    pub cc_arv: bool,
-    pub cc_ts: bool,
-    pub cc_tc: u8,
-    pub cc_uat_in: bool,
-    pub cc_poa: bool,
-    pub cc_b2_low: bool,
-    pub cc_nac_v: u8,
-    pub cc_nic_supp_c: bool,
-    pub cc_lw_valid: bool,
-
-    pub nic_supp_a: bool,
-    pub nac_p: u8,
-    pub gva: u8,
-    pub sil: u8,
-    pub nic_baro: bool,
-
-    pub sil_type: SilType,
-    pub track_angle: AngleType,
-    pub hrd: HeadingSource,
-
-    pub cc_lw: u32,
-    pub cc_antenna_offset: u32,
 }

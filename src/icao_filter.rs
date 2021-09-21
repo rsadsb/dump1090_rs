@@ -9,7 +9,6 @@ lazy_static! {
     static ref ICAO_FILTER_B: Mutex<Vec<u32>> = Mutex::new(vec![0; 4096]);
 }
 
-#[must_use]
 pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
 {
     let a: u64 = u64::from(a32);
@@ -36,48 +35,7 @@ pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
     (hash as u32) & (ICAO_FILTER_SIZE - 1)
 }
 
-pub fn icao_filter_add(addr: u32) {
-    if let Ok(mut icao_filter_active) = ICAO_FILTER_A.lock() {
-        // TODO: switch filters like the C code instead of using the same one every time
-        {
-            let mut h: u32 = icao_hash(addr);
-            let h0: u32 = icao_hash(addr);
-
-            while (icao_filter_active[h as usize] != 0) && (icao_filter_active[h as usize] != addr)
-            {
-                h = (h + 1) & (ICAO_FILTER_SIZE - 1);
-                if h == h0 {
-                    eprintln!("ICAO hash table full, increase ICAO_FILTER_SIZE");
-                    return;
-                }
-            }
-            if icao_filter_active[h as usize] == 0 {
-                icao_filter_active[h as usize] = addr;
-            }
-        }
-
-        // also add with a zeroed top byte, for handling DF20/21 with Data Parity
-        {
-            let mut h: u32 = icao_hash(addr & 0x0000_ffff);
-            let h0: u32 = icao_hash(addr & 0x0000_ffff);
-            while (icao_filter_active[h as usize] != 0)
-                && ((icao_filter_active[h as usize] & 0x0000_ffff) != (addr & 0x0000_ffff))
-            {
-                h = (h + 1) & (ICAO_FILTER_SIZE - 1);
-                if h == h0 {
-                    eprintln!("ICAO hash table full, increase ICAO_FILTER_SIZE\n");
-                    return;
-                }
-            }
-            if icao_filter_active[h as usize] == 0 {
-                icao_filter_active[h as usize] = addr;
-            }
-        }
-    }
-}
-
 // The original function uses a integer return value, but it's used as a boolean
-#[must_use]
 pub fn icao_filter_test(addr: u32) -> bool // icao_filter.c:96
 {
     let mut h: u32 = icao_hash(addr);

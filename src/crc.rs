@@ -259,16 +259,6 @@ pub const CRC_TABLE: [u32; 256] = [
     0x00FA_0480,
 ];
 
-pub const MODES_MAX_BITERRORS: usize = 2;
-
-#[derive(Debug)]
-struct ErrorInfo {
-    syndrome: u32,
-    errors: usize,
-    bit: [i8; MODES_MAX_BITERRORS],
-}
-
-#[must_use]
 pub fn modes_checksum(message: &[u8], bits: usize) -> u32 {
     let mut rem: u32 = 0;
     let n = bits / 8;
