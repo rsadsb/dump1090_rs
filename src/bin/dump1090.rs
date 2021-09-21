@@ -100,7 +100,7 @@ fn main() -> Result<(), &'static str> {
                 println!("{:02x?}", resulting_data);
                 for mut socket in &sockets {
                     for msg in &resulting_data {
-                        socket.write_all(msg);
+                        socket.write_all(msg).unwrap();
                     }
                 }
             }
