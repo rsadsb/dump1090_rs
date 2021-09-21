@@ -67,7 +67,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                 let mut slice_loc: usize = j + 19 + (try_phase / 5);
                 let mut phase: usize = try_phase % 5;
 
-                for k in 0..(MODES_LONG_MSG_BYTES) {
+                for msg in msg.iter_mut().take(MODES_LONG_MSG_BYTES) {
                     let slice_this_byte: &[u16] = &data[slice_loc..];
 
                     let (next_slice_loc, next_phase, the_byte) = match phase {
@@ -294,7 +294,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                         _ => panic!("Unexpected phase value"),
                     };
 
-                    msg[k] = the_byte;
+                    *msg = the_byte;
                     slice_loc = next_slice_loc;
                     phase = next_phase;
                 }
