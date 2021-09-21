@@ -170,7 +170,7 @@ pub fn decode(mm: &mut ModeSMessage) -> Result<(), &'static str> {
             // however! CL + IC only occupy the lower 7 bits of the CRC. So if we ignore those bits when testing
             // the CRC we can still try to detect/correct errors.
             mm.iid = mm.crc & 0x7f;
-            if mm.crc & 0xffff80 != 0 {
+            if mm.crc & 0x00ff_ff80 != 0 {
                 return Err("Failed CRC check for all-call reply");
             }
             mm.source = DataSource::ModeSChecked;
@@ -528,17 +528,17 @@ fn decode_extended_squitter(mm: &mut ModeSMessage) {
 
                     if ew_raw != 0 && ns_raw != 0 {
                         let scale: i32 = if mm.mesub == 2 { 4 } else { 1 };
-                        let ew_vel: f64 = {
+                        let ew_vel: f64 = f64::from({
                             let sign: i32 = if getbit(&mm.me, 14) != 0 { -1 } else { 1 };
                             (ew_raw - 1) * sign * scale
-                        } as f64;
-                        let ns_vel: f64 = {
+                        });
+                        let ns_vel: f64 = f64::from({
                             let sign: i32 = if getbit(&mm.me, 25) != 0 { -1 } else { 1 };
                             (ns_raw - 1) * sign * scale
-                        } as f64;
+                        });
 
                         // Compute velocity and angle from the two speed components
-                        let speed = ((ns_vel * ns_vel) + (ew_vel * ew_vel) + 0.5).sqrt();
+                        let speed = (ns_vel.mul_add(ns_vel, ew_vel * ew_vel) + 0.5).sqrt();
                         mm.speed = Some((speed as u32, SpeedSource::GroundSpeed));
 
                         mm.heading = match speed {
@@ -546,9 +546,10 @@ fn decode_extended_squitter(mm: &mut ModeSMessage) {
                             // different.  See issue #41620 <https://github.com/rust-lang/rust/issues/41620>
                             x if x == 0.0 => None,
                             _ => {
-                                let mut heading: i32 =
-                                    (ew_vel.atan2(ns_vel) * (180.0 / std::f64::consts::PI) + 0.5)
-                                        as i32;
+                                let mut heading: i32 = ew_vel
+                                    .atan2(ns_vel)
+                                    .mul_add(180.0 / std::f64::consts::PI, 0.5)
+                                    as i32;
                                 // We don't want negative values but a 0-360 scale
                                 if heading < 0 {
                                     heading += 360;
@@ -595,7 +596,7 @@ fn decode_extended_squitter(mm: &mut ModeSMessage) {
                 let lat: u32 = getbits(&mm.me, 23, 39) as u32;
                 let lon: u32 = getbits(&mm.me, 40, 56) as u32;
                 let odd: bool = getbit(&mm.me, 22) != 0;
-                let nucp: u32 = (14 - mm.metype) as u32;
+                let nucp: u32 = u32::from(14 - mm.metype);
                 let typ = CprType::Surface;
                 Some((lat, lon, odd, nucp, typ))
             };
@@ -647,13 +648,13 @@ fn decode_extended_squitter(mm: &mut ModeSMessage) {
                     let typ = CprType::Airborne;
                     let odd = getbit(&mm.me, 22) != 0;
 
-                    let nucp = if mm.metype == 18 || mm.metype == 22 {
+                    let nucp = u32::from(if mm.metype == 18 || mm.metype == 22 {
                         0
                     } else if mm.metype < 18 {
                         18 - mm.metype
                     } else {
                         29 - mm.metype
-                    } as u32;
+                    });
 
                     Some((cpr_lat, cpr_lon, odd, nucp, typ))
                 };
@@ -723,7 +724,7 @@ fn decode_extended_squitter(mm: &mut ModeSMessage) {
                 let baro = if baro_bits == 0 {
                     None
                 } else {
-                    Some(800.0 + (baro_bits as f32 - 1.0) * 0.8)
+                    Some((baro_bits as f32 - 1.0).mul_add(0.8, 800.0))
                 };
 
                 let heading = if getbit(&mm.me, 30) != 0 {
@@ -972,7 +973,7 @@ fn set_imf(addr: &mut u32, opt_addrtype: &mut Option<AddrType>) {
     *addr |= MODES_NON_ICAO_ADDRESS;
 
     let opt_new_addrtype = match opt_addrtype {
-        Some(AddrType::ADSB_ICAO) | Some(AddrType::ADSB_ICAO_NT) => Some(AddrType::ADSB_Other), // Shouldn't happen, but let's try to handle it
+        Some(AddrType::ADSB_ICAO | AddrType::ADSB_ICAO_NT) => Some(AddrType::ADSB_Other), // Shouldn't happen, but let's try to handle it
         Some(AddrType::TISB_ICAO) => Some(AddrType::TISB_Trackfile),
         Some(AddrType::ADSR_ICAO) => Some(AddrType::ADSR_Other),
         _ => None,

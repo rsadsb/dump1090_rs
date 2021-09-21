@@ -30,181 +30,181 @@ fn cpr_mod_double(a: f64, b: f64) -> f64 {
 fn cpr_nl_function(lat_signed: f64) -> i32 {
     let lat: f64 = lat_signed.abs(); // Symmetric
 
-    if lat < 10.47047130 {
+    if lat < 10.470_471_30 {
         return 59;
     }
-    if lat < 14.82817437 {
+    if lat < 14.828_174_37 {
         return 58;
     }
-    if lat < 18.18626357 {
+    if lat < 18.186_263_57 {
         return 57;
     }
-    if lat < 21.02939493 {
+    if lat < 21.029_394_93 {
         return 56;
     }
-    if lat < 23.54504487 {
+    if lat < 23.545_044_87 {
         return 55;
     }
-    if lat < 25.82924707 {
+    if lat < 25.829_247_07 {
         return 54;
     }
-    if lat < 27.93898710 {
+    if lat < 27.938_987_10 {
         return 53;
     }
-    if lat < 29.91135686 {
+    if lat < 29.911_356_86 {
         return 52;
     }
-    if lat < 31.77209708 {
+    if lat < 31.772_097_08 {
         return 51;
     }
-    if lat < 33.53993436 {
+    if lat < 33.539_934_36 {
         return 50;
     }
-    if lat < 35.22899598 {
+    if lat < 35.228_995_98 {
         return 49;
     }
-    if lat < 36.85025108 {
+    if lat < 36.850_251_08 {
         return 48;
     }
-    if lat < 38.41241892 {
+    if lat < 38.412_418_92 {
         return 47;
     }
-    if lat < 39.92256684 {
+    if lat < 39.922_566_84 {
         return 46;
     }
-    if lat < 41.38651832 {
+    if lat < 41.386_518_32 {
         return 45;
     }
-    if lat < 42.80914012 {
+    if lat < 42.809_140_12 {
         return 44;
     }
-    if lat < 44.19454951 {
+    if lat < 44.194_549_51 {
         return 43;
     }
-    if lat < 45.54626723 {
+    if lat < 45.546_267_23 {
         return 42;
     }
-    if lat < 46.86733252 {
+    if lat < 46.867_332_52 {
         return 41;
     }
-    if lat < 48.16039128 {
+    if lat < 48.160_391_28 {
         return 40;
     }
-    if lat < 49.42776439 {
+    if lat < 49.427_764_39 {
         return 39;
     }
-    if lat < 50.67150166 {
+    if lat < 50.671_501_66 {
         return 38;
     }
-    if lat < 51.89342469 {
+    if lat < 51.893_424_69 {
         return 37;
     }
-    if lat < 53.09516153 {
+    if lat < 53.095_161_53 {
         return 36;
     }
-    if lat < 54.27817472 {
+    if lat < 54.278_174_72 {
         return 35;
     }
-    if lat < 55.44378444 {
+    if lat < 55.443_784_44 {
         return 34;
     }
-    if lat < 56.59318756 {
+    if lat < 56.593_187_56 {
         return 33;
     }
-    if lat < 57.72747354 {
+    if lat < 57.727_473_54 {
         return 32;
     }
-    if lat < 58.84763776 {
+    if lat < 58.847_637_76 {
         return 31;
     }
-    if lat < 59.95459277 {
+    if lat < 59.954_592_77 {
         return 30;
     }
-    if lat < 61.04917774 {
+    if lat < 61.049_177_74 {
         return 29;
     }
-    if lat < 62.13216659 {
+    if lat < 62.132_166_59 {
         return 28;
     }
-    if lat < 63.20427479 {
+    if lat < 63.204_274_79 {
         return 27;
     }
-    if lat < 64.26616523 {
+    if lat < 64.266_165_23 {
         return 26;
     }
-    if lat < 65.31845310 {
+    if lat < 65.318_453_10 {
         return 25;
     }
-    if lat < 66.36171008 {
+    if lat < 66.361_710_08 {
         return 24;
     }
-    if lat < 67.39646774 {
+    if lat < 67.396_467_74 {
         return 23;
     }
-    if lat < 68.42322022 {
+    if lat < 68.423_220_22 {
         return 22;
     }
-    if lat < 69.44242631 {
+    if lat < 69.442_426_31 {
         return 21;
     }
-    if lat < 70.45451075 {
+    if lat < 70.454_510_75 {
         return 20;
     }
-    if lat < 71.45986473 {
+    if lat < 71.459_864_73 {
         return 19;
     }
-    if lat < 72.45884545 {
+    if lat < 72.458_845_45 {
         return 18;
     }
-    if lat < 73.45177442 {
+    if lat < 73.451_774_42 {
         return 17;
     }
-    if lat < 74.43893416 {
+    if lat < 74.438_934_16 {
         return 16;
     }
-    if lat < 75.42056257 {
+    if lat < 75.420_562_57 {
         return 15;
     }
-    if lat < 76.39684391 {
+    if lat < 76.396_843_91 {
         return 14;
     }
-    if lat < 77.36789461 {
+    if lat < 77.367_894_61 {
         return 13;
     }
-    if lat < 78.33374083 {
+    if lat < 78.333_740_83 {
         return 12;
     }
-    if lat < 79.29428225 {
+    if lat < 79.294_282_25 {
         return 11;
     }
-    if lat < 80.24923213 {
+    if lat < 80.249_232_13 {
         return 10;
     }
-    if lat < 81.19801349 {
+    if lat < 81.198_013_49 {
         return 9;
     }
-    if lat < 82.13956981 {
+    if lat < 82.139_569_81 {
         return 8;
     }
-    if lat < 83.07199445 {
+    if lat < 83.071_994_45 {
         return 7;
     }
-    if lat < 83.99173563 {
+    if lat < 83.991_735_63 {
         return 6;
     }
-    if lat < 84.89166191 {
+    if lat < 84.891_661_91 {
         return 5;
     }
-    if lat < 85.75541621 {
+    if lat < 85.755_416_21 {
         return 4;
     }
-    if lat < 86.53536998 {
+    if lat < 86.535_369_98 {
         return 3;
     }
-    if lat < 87.00000000 {
-        return 2;
+    if lat < 87.000_000_00 {
+        2
     } else {
-        return 1;
+        1
     }
 }
 
@@ -215,7 +215,7 @@ fn cpr_n_function(lat: f64, fflag: bool) -> i32 {
 }
 
 fn cpr_dlon_function(lat: f64, fflag: bool, surface: bool) -> f64 {
-    (if surface { 90.0 } else { 360.0 }) / (cpr_n_function(lat, fflag) as f64)
+    (if surface { 90.0 } else { 360.0 }) / f64::from(cpr_n_function(lat, fflag))
 }
 
 //
@@ -239,16 +239,16 @@ pub fn decode_cpr_airborne(
 ) -> i32 {
     let air_dlat0: f64 = 360.0 / 60.0;
     let air_dlat1: f64 = 360.0 / 59.0;
-    let lat0: f64 = even_cprlat as f64;
-    let lat1: f64 = odd_cprlat as f64;
-    let lon0: f64 = even_cprlon as f64;
-    let lon1: f64 = odd_cprlon as f64;
+    let lat0: f64 = f64::from(even_cprlat);
+    let lat1: f64 = f64::from(odd_cprlat);
+    let lon0: f64 = f64::from(even_cprlon);
+    let lon1: f64 = f64::from(odd_cprlon);
 
     // Compute the Latitude Index "j"
-    let j = (((59.0 * lat0 - 60.0 * lat1) / 131072.0) + 0.5).floor() as i32;
+    let j = (((59.0 * lat0 - 60.0 * lat1) / 131_072.0) + 0.5).floor() as i32;
 
-    let mut rlat0 = air_dlat0 * (cpr_mod_int(j, 60) as f64 + (lat0 / 131072.0));
-    let mut rlat1 = air_dlat1 * (cpr_mod_int(j, 59) as f64 + (lat1 / 131072.0));
+    let mut rlat0 = air_dlat0 * (f64::from(cpr_mod_int(j, 60)) + (lat0 / 131_072.0));
+    let mut rlat1 = air_dlat1 * (f64::from(cpr_mod_int(j, 59)) + (lat1 / 131_072.0));
 
     if rlat0 >= 270.0 {
         rlat0 -= 360.0;
@@ -258,7 +258,7 @@ pub fn decode_cpr_airborne(
     }
 
     // Check to see that the latitude is in range: -90 .. +90
-    if rlat0 < -90.0 || rlat0 > 90.0 || rlat1 < -90.0 || rlat1 > 90.0 {
+    if !(-90.0..=90.0).contains(&rlat0) || rlat1 < -90.0 || rlat1 > 90.0 {
         return -2; // bad data
     }
 
@@ -271,29 +271,29 @@ pub fn decode_cpr_airborne(
     let (mut rlon, rlat) = if fflag {
         // Use odd packet.
         let ni = cpr_n_function(rlat1, true);
-        let m = ((((lon0 * (cpr_nl_function(rlat1) as f64 - 1.0))
-            - (lon1 * cpr_nl_function(rlat1) as f64))
-            / 131072.0)
+        let m = ((((lon0 * (f64::from(cpr_nl_function(rlat1)) - 1.0))
+            - (lon1 * f64::from(cpr_nl_function(rlat1))))
+            / 131_072.0)
             + 0.5)
             .floor() as i32;
 
         (
             cpr_dlon_function(rlat1, true, false)
-                * ((cpr_mod_int(m, ni) as f64) + (lon1 / 131072.0)),
+                * (f64::from(cpr_mod_int(m, ni)) + (lon1 / 131_072.0)),
             rlat1,
         )
     } else {
         // Use even packet.
         let ni = cpr_n_function(rlat0, false);
-        let m = ((((lon0 * (cpr_nl_function(rlat0) - 1) as f64)
-            - (lon1 * cpr_nl_function(rlat0) as f64))
-            / 131072.0)
+        let m = ((((lon0 * f64::from(cpr_nl_function(rlat0) - 1))
+            - (lon1 * f64::from(cpr_nl_function(rlat0))))
+            / 131_072.0)
             + 0.5)
             .floor() as i32;
 
         (
             cpr_dlon_function(rlat0, false, false)
-                * ((cpr_mod_int(m, ni) as f64) + (lon0 / 131072.0)),
+                * (f64::from(cpr_mod_int(m, ni)) + (lon0 / 131_072.0)),
             rlat0,
         )
     };
@@ -327,20 +327,20 @@ pub fn decode_cpr_relative(
 ) -> Result<(f64, f64), &'static str> {
     let air_dlat = (if surface { 90.0 } else { 360.0 }) / (if fflag { 59.0 } else { 60.0 });
 
-    let fractional_lat: f64 = cprlat as f64 / 131072.0;
-    let fractional_lon: f64 = cprlon as f64 / 131072.0;
+    let fractional_lat: f64 = f64::from(cprlat) / 131_072.0;
+    let fractional_lon: f64 = f64::from(cprlon) / 131_072.0;
 
     // Compute the Latitude Index "j"
     let j: i32 = ((reflat / air_dlat).floor()
         + (0.5 + (cpr_mod_double(reflat, air_dlat) / air_dlat) - fractional_lat).floor())
         as i32;
 
-    let mut rlat: f64 = air_dlat * (j as f64 + fractional_lat);
+    let mut rlat: f64 = air_dlat * (f64::from(j) + fractional_lat);
     if rlat >= 270.0 {
         rlat -= 360.0;
     }
 
-    if rlat < -90.0 || rlat > 90.0 {
+    if !(-90.0..=90.0).contains(&rlat) {
         return Err("Invalid latitude in decode_cpr_relative (out of range)");
     }
     if (rlat - reflat).abs() > air_dlat / 2.0 {
@@ -353,7 +353,7 @@ pub fn decode_cpr_relative(
         + (0.5 + (cpr_mod_double(reflon, air_dlon) / air_dlon) - fractional_lon).floor())
         as i32;
 
-    let mut rlon: f64 = air_dlon * (m as f64 + fractional_lon);
+    let mut rlon: f64 = air_dlon * (f64::from(m) + fractional_lon);
     if rlon > 180.0 {
         rlon -= 360.0;
     }

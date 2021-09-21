@@ -9,7 +9,7 @@ use crate::{
     MODES_SHORT_MSG_BYTES,
 };
 
-pub const MAGIC_MLAT_TIMESTAMP: usize = 0xFF004D4C4154;
+pub const MAGIC_MLAT_TIMESTAMP: usize = 0xFF00_4D4C_4154;
 
 #[derive(Debug)]
 // Navigation Uncertainty Category (NUC)
@@ -23,6 +23,7 @@ pub struct Position {
 mod decode;
 
 // mode_s.c:77
+#[must_use]
 pub fn modes_message_len_by_type(typ: u8) -> usize {
     if typ & 0x10 != 0 {
         MODES_LONG_MSG_BYTES * 8
@@ -31,11 +32,13 @@ pub fn modes_message_len_by_type(typ: u8) -> usize {
     }
 }
 
+#[must_use]
 pub fn getbit(data: &[u8], bit_1idx: usize) -> usize {
     getbits(data, bit_1idx, bit_1idx)
 }
 
 // mode_s.c:215
+#[must_use]
 pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize {
     let mut ans: usize = 0;
 
@@ -45,8 +48,8 @@ pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize 
     for bit_idx in firstbit..=lastbit {
         ans *= 2;
         let byte_idx: usize = bit_idx / 8;
-        let mask = 2u8.pow(7u32 - (bit_idx as u32) % 8);
-        if (data[byte_idx] & mask) != 0u8 {
+        let mask = 2_u8.pow(7_u32 - (bit_idx as u32) % 8);
+        if (data[byte_idx] & mask) != 0_u8 {
             ans += 1;
         }
     }
@@ -55,6 +58,7 @@ pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize 
 }
 
 // mode_s.c:289
+#[must_use]
 pub fn score_modes_message(msg: &[u8]) -> i32 {
     let validbits = msg.len() * 8;
 
@@ -62,7 +66,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
         return -2;
     }
 
-    let msgtype = getbits(&msg, 1, 5);
+    let msgtype = getbits(msg, 1, 5);
     let msgbits = if (msgtype & 0x10) != 0 {
         MODES_LONG_MSG_BYTES * 8
     } else {
@@ -102,7 +106,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
         11 => {
             // 11: All-call reply
             let iid = crc & 0x7f;
-            let crc = crc & 0xffff80;
+            let crc = crc & 0x00ff_ff80;
             let addr = getbits(msg, 9, 32) as u32;
 
             match (crc, iid, super::icao_filter::icao_filter_test(addr)) {
@@ -168,7 +172,7 @@ fn es_type_has_subtype(metype: u8) -> bool {
         return false;
     }
 
-    if metype >= 20 && metype <= 22 {
+    if (20..=22).contains(&metype) {
         return false;
     }
 
@@ -254,7 +258,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
         // eprint!("{:02x}", mm.msg[j]);
     }
 
-    print!(";\n");
+    println!(";");
     // eprint!(";\n");
 
     if mm.msgtype < 32 {
@@ -344,7 +348,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
             print!(" {} ({})", es_type_name(mm.metype, mm.mesub), mm.metype);
         }
     }
-    print!("\n");
+    println!();
 
     {
         // Note: I'm not sure if defaulting to ADSB_ICAO is really what we want, but it seems to be what the C code
@@ -353,7 +357,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
         if mm.addr & MODES_NON_ICAO_ADDRESS != 0 {
             println!(
                 "  Other Address: {:06X} ({})",
-                mm.addr & 0xFFFFFF,
+                mm.addr & 0x00FF_FFFF,
                 addrtype_to_string(&addrtype)
             );
         } else {
@@ -491,7 +495,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
         if opstatus.cc_antenna_offset != 0 {
             print!("GPS-OFFSET={} ", opstatus.cc_antenna_offset);
         }
-        print!("\n");
+        println!();
 
         print!("    Operational modes:  ");
         if opstatus.om_acas_ra {
@@ -509,7 +513,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
         if opstatus.om_sda != 0 {
             print!("SDA={} ", opstatus.om_sda);
         }
-        print!("\n");
+        println!();
 
         if opstatus.nic_supp_a {
             println!(
@@ -583,7 +587,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
             if tss.mode_approach {
                 print!("approach ");
             }
-            print!("\n");
+            println!();
         }
 
         let sil_type_str = match &tss.sil_type {
@@ -607,7 +611,7 @@ pub fn display_mode_s_message(mm: &ModeSMessage) {
         println!("    SIL:               {} ({})", tss.sil, sil_type_str); // from opstatus?
     }
 
-    print!("\n");
+    println!();
 }
 
 // mode_s.c:1707

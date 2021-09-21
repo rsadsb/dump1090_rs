@@ -5,7 +5,7 @@ pub fn mode_a_to_mode_c(mode_a: u32) -> Result<u32, &'static str> {
     let mut one_hundreds: u32 = 0;
 
     // check zero bits are zero, D1 set is illegal; C1,,C4 cannot be Zero
-    if (mode_a & 0xFFFF8889) != 0 || (mode_a & 0x000000F0) == 0 {
+    if (mode_a & 0xFFFF_8889) != 0 || (mode_a & 0x0000_00F0) == 0 {
         return Err("Invalid altitude");
     }
 

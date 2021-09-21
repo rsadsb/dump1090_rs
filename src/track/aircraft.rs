@@ -188,7 +188,7 @@ impl Aircraft {
         let mut speed: u32 = self
             .speed
             .get_if_valid()
-            .map(|x| *x)
+            .copied()
             .or(self.speed_ias.get_if_valid().map(|s| (s * 4) / 3))
             .or(self.speed_tas.get_if_valid().map(|s| (s * 4) / 3))
             .unwrap_or(if surface { 100 } else { 600 }); // guess
@@ -207,8 +207,10 @@ impl Aircraft {
 
         // 100m (surface) or 500m (airborne) base distance to allow for minor errors,
         // plus distance covered at the given speed for the elapsed time + 1 second.
-        let range: f64 = (if surface { 0.1e3 } else { 0.5e3 })
-            + ((elapsed as f64 + 1000.0) / 1000.0) * (speed as f64 * 1852.0 / 3600.0);
+        let range: f64 = ((elapsed as f64 + 1000.0) / 1000.0).mul_add(
+            f64::from(speed) * 1852.0 / 3600.0,
+            if surface { 0.1e3 } else { 0.5e3 },
+        );
 
         // find actual distance
         let distance: f64 = super::greatcircle(a_lat, a_lon, lat, lon);

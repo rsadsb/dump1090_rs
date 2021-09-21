@@ -74,7 +74,7 @@ impl RtlSdrDevice {
         let result_code = unsafe { rtlsdr_open(&mut dev, idx) };
 
         match result_code {
-            0 => Ok(RtlSdrDevice { dev }),
+            0 => Ok(Self { dev }),
             _ => Err("Expected result code of zero"),
         }
     }
@@ -207,10 +207,12 @@ pub struct UsbStrings {
     serial: String,
 }
 
+#[must_use]
 pub fn get_device_count() -> u32 {
     unsafe { rtlsdr_get_device_count() }
 }
 
+#[must_use]
 pub fn get_device_name(idx: u32) -> &'static str {
     unsafe {
         let ptr = rtlsdr_get_device_name(idx);
@@ -219,9 +221,9 @@ pub fn get_device_name(idx: u32) -> &'static str {
 }
 
 pub fn get_device_usb_strings(idx: u32) -> Result<UsbStrings, &'static str> {
-    let mfg: *mut c_char = CString::new(vec![20u8; 256]).unwrap().into_raw();
-    let prd: *mut c_char = CString::new(vec![20u8; 256]).unwrap().into_raw();
-    let ser: *mut c_char = CString::new(vec![20u8; 256]).unwrap().into_raw();
+    let mfg: *mut c_char = CString::new(vec![20_u8; 256]).unwrap().into_raw();
+    let prd: *mut c_char = CString::new(vec![20_u8; 256]).unwrap().into_raw();
+    let ser: *mut c_char = CString::new(vec![20_u8; 256]).unwrap().into_raw();
 
     unsafe {
         let return_code = rtlsdr_get_device_usb_strings(idx, mfg, prd, ser);

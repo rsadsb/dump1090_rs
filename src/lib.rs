@@ -20,7 +20,7 @@ pub mod mode_s;
 pub mod rtlsdr;
 pub mod track;
 
-pub const MODES_MAG_BUF_SAMPLES: usize = 131072;
+pub const MODES_MAG_BUF_SAMPLES: usize = 131_072;
 
 // dump1090.h:101
 pub const MODEAC_MSG_SAMPLES: u32 = 50; // include up to the SPI bit
@@ -37,7 +37,7 @@ pub const TRAILING_SAMPLES: usize = 326;
 pub const MODES_LONG_MSG_BYTES: usize = 14;
 pub const MODES_SHORT_MSG_BYTES: usize = 7;
 
-pub const MODES_NON_ICAO_ADDRESS: u32 = 16777216;
+pub const MODES_NON_ICAO_ADDRESS: u32 = 16_777_216;
 
 lazy_static! {
     pub static ref MAG_LUT: Vec<u16> = {
@@ -47,7 +47,7 @@ lazy_static! {
             for q in 0..256 {
                 let fi = (i as f32 - 127.5) / 127.5;
                 let fq = (q as f32 - 127.5) / 127.5;
-                let magsq: f32 = match fi * fi + fq * fq {
+                let magsq: f32 = match fi.mul_add(fi, fq * fq) {
                     x if x > 1.0 => 1.0,
                     x => x,
                 };
@@ -147,43 +147,43 @@ pub enum AngleType {
 }
 
 impl Default for AddrType {
-    fn default() -> AddrType {
-        AddrType::Unknown
+    fn default() -> Self {
+        Self::Unknown
     }
 }
 impl Default for AirGround {
-    fn default() -> AirGround {
-        AirGround::Uncertain
+    fn default() -> Self {
+        Self::Uncertain
     }
 }
 impl Default for AltitudeSource {
-    fn default() -> AltitudeSource {
-        AltitudeSource::Baro
+    fn default() -> Self {
+        Self::Baro
     }
 }
 impl Default for CprType {
-    fn default() -> CprType {
-        CprType::Coarse
+    fn default() -> Self {
+        Self::Coarse
     }
 }
 impl Default for DataSource {
-    fn default() -> DataSource {
-        DataSource::Invalid
+    fn default() -> Self {
+        Self::Invalid
     }
 }
 impl Default for HeadingSource {
-    fn default() -> HeadingSource {
-        HeadingSource::True
+    fn default() -> Self {
+        Self::True
     }
 }
 impl Default for SilType {
-    fn default() -> SilType {
-        SilType::SilPerSample
+    fn default() -> Self {
+        Self::SilPerSample
     }
 }
 impl Default for AngleType {
-    fn default() -> AngleType {
-        AngleType::Track
+    fn default() -> Self {
+        Self::Track
     }
 }
 
@@ -197,9 +197,9 @@ pub struct MagnitudeBuffer {
 }
 
 impl Default for MagnitudeBuffer {
-    fn default() -> MagnitudeBuffer {
-        MagnitudeBuffer {
-            data: Box::new([0u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]),
+    fn default() -> Self {
+        Self {
+            data: Box::new([0_u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]),
             length: 0,
             first_sample_timestamp_12mhz: 0,
             dropped: 0,
