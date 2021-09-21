@@ -61,7 +61,6 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             // Try all phases
             let mut bestmsg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
             let mut bestscore: i32 = -2;
-            let mut bestphase: usize = 0;
 
             let mut msg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
             for try_phase in 4..9 {
@@ -305,7 +304,6 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                 if score > bestscore {
                     bestmsg.clone_from_slice(&msg);
                     bestscore = score;
-                    bestphase = try_phase;
                 }
             }
 
