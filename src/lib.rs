@@ -8,8 +8,7 @@ timing, and things like that might give results that are not quite identical.
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-#[macro_use]
-extern crate lazy_static;
+use lazy_static::lazy_static;
 
 // public
 pub mod demod_2400;

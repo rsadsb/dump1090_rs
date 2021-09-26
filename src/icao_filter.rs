@@ -1,5 +1,6 @@
 //This module includes functionality translated from icao_filter.c
 
+use lazy_static::lazy_static;
 use std::sync::Mutex;
 
 const ICAO_FILTER_SIZE: u32 = 4096;
