@@ -105,10 +105,23 @@ fn main() -> Result<(), &'static str> {
                         format!("*{};\n", a)
                     })
                     .collect();
-                for mut socket in &sockets {
+
+                let mut remove_indexs = vec![];
+                for (i, mut socket) in &mut sockets.iter().enumerate() {
                     for msg in &resulting_data {
-                        socket.write_all(msg.as_bytes()).unwrap();
+                        // write, or add to remove list if ConnectionReset
+                        if let Err(e) = socket.write_all(msg.as_bytes()) {
+                            if e.kind() == std::io::ErrorKind::ConnectionReset {
+                                remove_indexs.push(i);
+                                break;
+                            }
+                        }
                     }
+                }
+
+                // remove
+                for i in remove_indexs {
+                    sockets.remove(i);
                 }
             }
         }
