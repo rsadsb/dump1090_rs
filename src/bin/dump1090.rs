@@ -1,4 +1,3 @@
-
 lazy_static::lazy_static! {
     static ref MODES: Mutex<dump1090_rs::Modes> = Mutex::new(dump1090_rs::Modes::default());
 }
@@ -90,8 +89,6 @@ fn main() -> Result<(), &'static str> {
                     }
                 }
             }
-
-            outbuf.total_power = (total_power_u64 as f64) / 65535.0 / 65535.0;
 
             let resulting_data = dump1090_rs::demod_2400::demodulate2400(outbuf).unwrap();
             if !resulting_data.is_empty() {
