@@ -11,6 +11,4 @@ cargo r --release
 ```
 
 # Changes
-- Removed packet parsing functions
-- Removed read in from file
-- Added TCP forwarding to client, with same data string as dump1090_fa
+See [CHANGELOG.md](https://github.com/wcampbell0x2a/dump1090_rs/blob/master/CHANGELOG.md)
