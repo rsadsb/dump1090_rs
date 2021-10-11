@@ -56,8 +56,6 @@ pub struct MagnitudeBuffer {
     pub data: Box<[u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]>,
     pub length: usize,
     pub first_sample_timestamp_12mhz: usize,
-    pub dropped: usize,
-    pub total_power: f64,
 }
 
 impl Default for MagnitudeBuffer {
@@ -66,8 +64,6 @@ impl Default for MagnitudeBuffer {
             data: Box::new([0_u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]),
             length: 0,
             first_sample_timestamp_12mhz: 0,
-            dropped: 0,
-            total_power: 0.0,
         }
     }
 }
