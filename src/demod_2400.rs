@@ -32,7 +32,7 @@ impl From<usize> for Phase {
 
 impl Phase {
     /// Increment from 0..4 for incrementing the starting phase
-    fn next_start(&self) -> Self {
+    fn next_start(self) -> Self {
         match self {
             Self::Zero => Self::One,
             Self::One => Self::Two,
@@ -43,7 +43,7 @@ impl Phase {
     }
 
     /// Increment by expected next phase transition for bit denoting
-    fn next(&self) -> Self {
+    fn next(self) -> Self {
         match self {
             Self::Zero => Self::Two,
             Self::Two => Self::Four,
@@ -54,14 +54,12 @@ impl Phase {
     }
 
     /// Amount of mag indexs used, for adding to the next start index
-    fn increment_index(&self, index: usize) -> usize {
-        index + match self {
-            Self::Zero => 2,
-            Self::Two => 2,
-            Self::Four => 3,
-            Self::One => 2,
-            Self::Three => 3,
-        }
+    fn increment_index(self, index: usize) -> usize {
+        index
+            + match self {
+                Self::Zero | Self::Two | Self::One => 2,
+                Self::Four | Self::Three => 3,
+            }
     }
 
     /// Calculate the PPM bit
@@ -133,7 +131,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                     for i in 0..8 {
                         // find if phase distance denotes a high bit
                         if phase.calculate_bit(&slice_this_byte[index..]) > 0 {
-                            the_byte |= 1 << (7 - i)
+                            the_byte |= 1 << (7 - i);
                         }
                         // increment to next phase, increase index
                         index = phase.increment_index(index);

@@ -69,12 +69,9 @@ fn main() -> Result<(), &'static str> {
         if let Ok(mut modes) = MODES.lock() {
             let outbuf: &mut MagnitudeBuffer = modes.next_buffer(fs);
 
-            let mut total_power_u64: u64 = 0;
-
             let read_result = dev.read(&mut f_buffer);
             match read_result {
-                Err(_) => active = false,
-                Ok(0) => active = false,
+                Err(_) | Ok(0) => active = false,
                 Ok(n) => {
                     let mut rdr = Cursor::new(&f_buffer[..n]);
 
@@ -84,8 +81,6 @@ fn main() -> Result<(), &'static str> {
                         let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
 
                         outbuf.push(this_mag);
-
-                        total_power_u64 += u64::from(this_mag) * u64::from(this_mag);
                     }
                 }
             }

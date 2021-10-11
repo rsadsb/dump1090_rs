@@ -91,7 +91,7 @@ impl Modes {
             if self.mag_buffer_b.length > 0 {
                 let n = self.mag_buffer_b.length;
                 self.mag_buffer_a.data[..TRAILING_SAMPLES]
-                    .clone_from_slice(&self.mag_buffer_b.data[(n - TRAILING_SAMPLES)..n])
+                    .clone_from_slice(&self.mag_buffer_b.data[(n - TRAILING_SAMPLES)..n]);
             };
             self.mag_buffer_a.length = 0;
 
@@ -106,7 +106,7 @@ impl Modes {
             if self.mag_buffer_a.length > 0 {
                 let n = self.mag_buffer_a.length;
                 self.mag_buffer_b.data[..TRAILING_SAMPLES]
-                    .clone_from_slice(&self.mag_buffer_a.data[(n - TRAILING_SAMPLES)..n])
+                    .clone_from_slice(&self.mag_buffer_a.data[(n - TRAILING_SAMPLES)..n]);
             };
             self.mag_buffer_b.length = 0;
 
