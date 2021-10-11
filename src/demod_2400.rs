@@ -55,7 +55,7 @@ impl Phase {
 
     /// Amount of mag indexs used, for adding to the next start index
     fn increment_index(&self, index: usize) -> usize {
-        match self {
+        index + match self {
             Self::Zero => 2,
             Self::Two => 2,
             Self::Four => 3,
@@ -136,12 +136,12 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                             the_byte |= 1 << (7 - i)
                         }
                         // increment to next phase, increase index
-                        index += phase.increment_index(index);
+                        index = phase.increment_index(index);
                         phase = phase.next();
                     }
                     // save bytes and move the next starting phase
                     *msg = the_byte;
-                    slice_loc = slice_loc + index;
+                    slice_loc += index;
                     phase = starting_phase.next_start();
                 }
 
