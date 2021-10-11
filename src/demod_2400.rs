@@ -3,24 +3,80 @@
 use crate::mode_s;
 use crate::{MagnitudeBuffer, MODES_LONG_MSG_BYTES};
 
-fn slice_phase0(m: &[u16]) -> i32 {
-    5 * i32::from(m[0]) - 3 * i32::from(m[1]) - 2 * i32::from(m[2])
+#[derive(Clone, Copy, Debug)]
+enum Phase {
+    /// 0|2|4|1|3|0|2|4 -> One
+    Zero,
+    /// 1|3|0|2|4|1|3|0 -> Two
+    One,
+    /// 2|4|1|3|0|2|4|1 -> Three
+    Two,
+    /// 3|0|2|4|1|3|0|2 -> Four
+    Three,
+    /// 4|1|3|0|2|4|1|3 -> Zero
+    Four,
 }
 
-fn slice_phase1(m: &[u16]) -> i32 {
-    4 * i32::from(m[0]) - i32::from(m[1]) - 3 * i32::from(m[2])
+impl From<usize> for Phase {
+    fn from(num: usize) -> Self {
+        match num % 5 {
+            0 => Self::Zero,
+            1 => Self::One,
+            2 => Self::Two,
+            3 => Self::Three,
+            4 => Self::Four,
+            _ => unimplemented!(),
+        }
+    }
 }
 
-fn slice_phase2(m: &[u16]) -> i32 {
-    3 * i32::from(m[0]) + i32::from(m[1]) - 4 * i32::from(m[2])
-}
+impl Phase {
+    /// Increment from 0..4 for incrementing the starting phase
+    fn next_start(&self) -> Self {
+        match self {
+            Self::Zero => Self::One,
+            Self::One => Self::Two,
+            Self::Two => Self::Three,
+            Self::Three => Self::Four,
+            Self::Four => Self::Zero,
+        }
+    }
 
-fn slice_phase3(m: &[u16]) -> i32 {
-    2 * i32::from(m[0]) + 3 * i32::from(m[1]) - 5 * i32::from(m[2])
-}
+    /// Increment by expected next phase transition for bit denoting
+    fn next(&self) -> Self {
+        match self {
+            Self::Zero => Self::Two,
+            Self::Two => Self::Four,
+            Self::Four => Self::One,
+            Self::One => Self::Three,
+            Self::Three => Self::Zero,
+        }
+    }
 
-fn slice_phase4(m: &[u16]) -> i32 {
-    i32::from(m[0]) + 5 * i32::from(m[1]) - 5 * i32::from(m[2]) - i32::from(m[3])
+    /// Amount of mag indexs used, for adding to the next start index
+    fn increment_index(&self, index: usize) -> usize {
+        match self {
+            Self::Zero => 2,
+            Self::Two => 2,
+            Self::Four => 3,
+            Self::One => 2,
+            Self::Three => 3,
+        }
+    }
+
+    /// Calculate the PPM bit
+    fn calculate_bit(&self, m: &[u16]) -> i32 {
+        let m0 = i32::from(m[0]);
+        let m1 = i32::from(m[1]);
+        let m2 = i32::from(m[2]);
+        match self {
+            Self::Zero => 5 * m0 - 3 * m1 - 2 * m2,
+            Self::One => 4 * m0 - m1 - 3 * m2,
+            Self::Two => 3 * m0 + m1 - 4 * m2,
+            Self::Three => 2 * m0 + 3 * m1 - 5 * m2,
+            Self::Four => m0 + 5 * m1 - 5 * m2 - i32::from(m[3]),
+        }
+    }
 }
 
 pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static str> {
@@ -65,238 +121,28 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             let mut msg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
             for try_phase in 4..9 {
                 let mut slice_loc: usize = j + 19 + (try_phase / 5);
-                let mut phase: usize = try_phase % 5;
+                let mut phase = Phase::from(try_phase);
 
                 for msg in msg.iter_mut().take(MODES_LONG_MSG_BYTES) {
                     let slice_this_byte: &[u16] = &data[slice_loc..];
 
-                    let (next_slice_loc, next_phase, the_byte) = match phase {
-                        0 => {
-                            let mut the_byte = if slice_phase0(slice_this_byte) > 0 {
-                                0x80
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[2..]) > 0 {
-                                0x40
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[4..]) > 0 {
-                                0x20
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[7..]) > 0 {
-                                0x10
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[9..]) > 0 {
-                                0x08
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[12..]) > 0 {
-                                0x04
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[14..]) > 0 {
-                                0x02
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[16..]) > 0 {
-                                0x01
-                            } else {
-                                0x00
-                            };
-
-                            (slice_loc + 19, 1, the_byte)
+                    let starting_phase = phase;
+                    let mut the_byte = 0x00;
+                    let mut index = 0;
+                    // for each phase-bit
+                    for i in 0..8 {
+                        // find if phase distance denotes a high bit
+                        if phase.calculate_bit(&slice_this_byte[index..]) > 0 {
+                            the_byte |= 1 << (7 - i)
                         }
-                        1 => {
-                            let mut the_byte = if slice_phase1(slice_this_byte) > 0 {
-                                0x80
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[2..]) > 0 {
-                                0x40
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[5..]) > 0 {
-                                0x20
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[7..]) > 0 {
-                                0x10
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[9..]) > 0 {
-                                0x08
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[12..]) > 0 {
-                                0x04
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[14..]) > 0 {
-                                0x02
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[17..]) > 0 {
-                                0x01
-                            } else {
-                                0x00
-                            };
-
-                            (slice_loc + 19, 2, the_byte)
-                        }
-                        2 => {
-                            let mut the_byte = if slice_phase2(slice_this_byte) > 0 {
-                                0x80
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[2..]) > 0 {
-                                0x40
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[5..]) > 0 {
-                                0x20
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[7..]) > 0 {
-                                0x10
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[10..]) > 0 {
-                                0x08
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[12..]) > 0 {
-                                0x04
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[14..]) > 0 {
-                                0x02
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[17..]) > 0 {
-                                0x01
-                            } else {
-                                0x00
-                            };
-
-                            (slice_loc + 19, 3, the_byte)
-                        }
-                        3 => {
-                            let mut the_byte = if slice_phase3(slice_this_byte) > 0 {
-                                0x80
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[3..]) > 0 {
-                                0x40
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[5..]) > 0 {
-                                0x20
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[7..]) > 0 {
-                                0x10
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[10..]) > 0 {
-                                0x08
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[12..]) > 0 {
-                                0x04
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[15..]) > 0 {
-                                0x02
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[17..]) > 0 {
-                                0x01
-                            } else {
-                                0x00
-                            };
-
-                            (slice_loc + 19, 4, the_byte)
-                        }
-                        4 => {
-                            let mut the_byte = if slice_phase4(slice_this_byte) > 0 {
-                                0x80
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[3..]) > 0 {
-                                0x40
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[5..]) > 0 {
-                                0x20
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase0(&slice_this_byte[8..]) > 0 {
-                                0x10
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase2(&slice_this_byte[10..]) > 0 {
-                                0x08
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase4(&slice_this_byte[12..]) > 0 {
-                                0x04
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase1(&slice_this_byte[15..]) > 0 {
-                                0x02
-                            } else {
-                                0x00
-                            };
-                            the_byte |= if slice_phase3(&slice_this_byte[17..]) > 0 {
-                                0x01
-                            } else {
-                                0x00
-                            };
-
-                            (slice_loc + 20, 0, the_byte)
-                        }
-                        _ => panic!("Unexpected phase value"),
-                    };
-
+                        // increment to next phase, increase index
+                        index += phase.increment_index(index);
+                        phase = phase.next();
+                    }
+                    // save bytes and move the next starting phase
                     *msg = the_byte;
-                    slice_loc = next_slice_loc;
-                    phase = next_phase;
+                    slice_loc = slice_loc + index;
+                    phase = starting_phase.next_start();
                 }
 
                 let score = mode_s::score_modes_message(&msg);
