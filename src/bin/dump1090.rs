@@ -1,7 +1,5 @@
-#[macro_use]
-extern crate lazy_static;
 
-lazy_static! {
+lazy_static::lazy_static! {
     static ref MODES: Mutex<dump1090_rs::Modes> = Mutex::new(dump1090_rs::Modes::default());
 }
 
