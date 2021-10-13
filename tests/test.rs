@@ -17,6 +17,14 @@ fn demod_iq(iq_buf: &[u8]) -> Vec<[u8; 14]> {
 }
 
 #[test]
+fn test_00() {
+    let f_buffer = std::fs::read("tests/test_00.iq").unwrap();
+    let resulting_data = demod_iq(&f_buffer);
+    let expected_data = [[0x5d, 0xa0, 0x56, 0xf9, 0x89, 0xc2, 0x29, 0x85, 0x29, 0x31, 0x3a, 0xc3, 0x53, 0x10]];
+    assert_eq_hex!(expected_data, &*resulting_data);
+}
+
+#[test]
 fn test_01() {
     let f_buffer = std::fs::read("tests/test_01.iq").unwrap();
     let resulting_data = demod_iq(&f_buffer);

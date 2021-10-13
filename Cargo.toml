@@ -15,3 +15,8 @@ hex = "0.4"
 
 [dev-dependencies]
 assert_hex = "0.2"
+criterion = "0.3"
+
+[[bench]]
+name = "demod_benchmark"
+harness = false
