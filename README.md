@@ -4,15 +4,22 @@
 Fork of https://github.com/johnwstanford/dump1090_rs, without parsing messages.
 This project is meant to just forward bytes from the the demodulated iq stream from a rtlsdr to my own [adsb_deku](https://github.com/wcampbell0x2a/adsb_deku) library/apps.
 
-# Usage
+## Usage
 
 ```
 cargo r --release
 ```
 
-# Testing
+## Testing
 ```
 cargo t --release
+```
+
+## Benchmark
+
+Reading from a 256KB iq sample to ADS-B bytes takes ~3.5218 ms, but feel free to run benchmarks on your computer.
+```
+cargo bench
 ```
 
 # Changes
