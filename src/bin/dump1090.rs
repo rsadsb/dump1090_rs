@@ -73,10 +73,10 @@ fn main() -> Result<(), &'static str> {
             match read_result {
                 Err(_) | Ok(0) => active = false,
                 Ok(n) => {
+                    // un-comment this for creating test data
+                    //std::fs::write("test_01.iq", &f_buffer[..n]);
                     let mut rdr = Cursor::new(&f_buffer[..n]);
 
-                    // The choice of BigEndian vs LittleEndian determines which is I and which is Q but
-                    // since we're just taking the magnitude, it doesn't matter
                     while let Ok(iq) = rdr.read_u16::<BigEndian>() {
                         let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
 
