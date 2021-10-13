@@ -11,7 +11,7 @@ use std::sync::Mutex;
 use byteorder::{BigEndian, ReadBytesExt};
 use clap::App;
 
-use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
+use dump1090_rs::{rtlsdr, MODES_MAG_BUF_SAMPLES};
 
 fn main() -> Result<(), &'static str> {
     let _matches = App::new("Rust dump1090")
@@ -67,7 +67,7 @@ fn main() -> Result<(), &'static str> {
             sockets.push(s);
         }
         if let Ok(mut modes) = MODES.lock() {
-            let outbuf: &mut MagnitudeBuffer = modes.next_buffer(fs);
+            let outbuf = &mut modes.next_buffer(fs);
 
             let read_result = dev.read(&mut f_buffer);
             match read_result {

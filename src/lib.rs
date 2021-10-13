@@ -52,8 +52,9 @@ lazy_static! {
 }
 
 // dump1090.h:252
+#[derive(Copy, Clone, Debug)]
 pub struct MagnitudeBuffer {
-    pub data: Box<[u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]>,
+    pub data: [u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES],
     pub length: usize,
     pub first_sample_timestamp_12mhz: usize,
 }
@@ -61,7 +62,7 @@ pub struct MagnitudeBuffer {
 impl Default for MagnitudeBuffer {
     fn default() -> Self {
         Self {
-            data: Box::new([0_u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES]),
+            data: [0_u16; TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES],
             length: 0,
             first_sample_timestamp_12mhz: 0,
         }
@@ -83,37 +84,27 @@ pub struct Modes {
 }
 
 impl Modes {
-    pub fn next_buffer(&mut self, fs: usize) -> &mut MagnitudeBuffer {
-        if self.use_buffer_a_next {
-            self.mag_buffer_a.first_sample_timestamp_12mhz =
-                self.mag_buffer_b.first_sample_timestamp_12mhz
-                    + ((12_000_000 * self.mag_buffer_b.length) / fs);
-            if self.mag_buffer_b.length > 0 {
-                let n = self.mag_buffer_b.length;
-                self.mag_buffer_a.data[..TRAILING_SAMPLES]
-                    .clone_from_slice(&self.mag_buffer_b.data[(n - TRAILING_SAMPLES)..n]);
-            };
-            self.mag_buffer_a.length = 0;
-
+    pub fn next_buffer(&mut self, fs: usize) -> MagnitudeBuffer {
+        let (mut next, other) = if self.use_buffer_a_next {
             // Switch the active buffer for the next call
             self.use_buffer_a_next = false;
 
-            &mut self.mag_buffer_a
+            (self.mag_buffer_a, self.mag_buffer_b)
         } else {
-            self.mag_buffer_b.first_sample_timestamp_12mhz =
-                self.mag_buffer_a.first_sample_timestamp_12mhz
-                    + ((12_000_000 * self.mag_buffer_a.length) / fs);
-            if self.mag_buffer_a.length > 0 {
-                let n = self.mag_buffer_a.length;
-                self.mag_buffer_b.data[..TRAILING_SAMPLES]
-                    .clone_from_slice(&self.mag_buffer_a.data[(n - TRAILING_SAMPLES)..n]);
-            };
-            self.mag_buffer_b.length = 0;
-
             // Switch the active buffer for the next call
             self.use_buffer_a_next = true;
 
-            &mut self.mag_buffer_b
-        }
+            (self.mag_buffer_b, self.mag_buffer_a)
+        };
+
+        next.first_sample_timestamp_12mhz =
+            other.first_sample_timestamp_12mhz + ((12_000_000 * other.length) / fs);
+        if other.length > 0 {
+            let n = other.length;
+            next.data[..TRAILING_SAMPLES].clone_from_slice(&other.data[(n - TRAILING_SAMPLES)..n]);
+        };
+        next.length = 0;
+
+        next
     }
 }
