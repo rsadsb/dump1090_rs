@@ -10,5 +10,10 @@ This project is meant to just forward bytes from the the demodulated iq stream f
 cargo r --release
 ```
 
+# Testing
+```
+cargo t --release
+```
+
 # Changes
 See [CHANGELOG.md](https://github.com/wcampbell0x2a/dump1090_rs/blob/master/CHANGELOG.md)

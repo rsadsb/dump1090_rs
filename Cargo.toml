@@ -12,3 +12,6 @@ clap = "2.33"
 lazy_static = "1.4"
 libc = "0.2"
 hex = "0.4"
+
+[dev-dependencies]
+assert_hex = "0.2"
