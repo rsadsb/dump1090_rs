@@ -1,10 +1,15 @@
-use assert_hex::assert_eq_hex;
-use byteorder::{BigEndian, ReadBytesExt};
+// std
 use std::io::Cursor;
 
+// third-part
+use assert_hex::assert_eq_hex;
+use byteorder::{BigEndian, ReadBytesExt};
+
+// crate
+use dump1090_rs::MagnitudeBuffer;
+
 fn demod_iq(iq_buf: &[u8]) -> Vec<[u8; 14]> {
-    let mut modes = dump1090_rs::Modes::default();
-    let outbuf = &mut modes.next_buffer(2_400_000);
+    let mut outbuf = MagnitudeBuffer::default();
 
     let mut rdr = Cursor::new(&iq_buf);
 
@@ -13,7 +18,7 @@ fn demod_iq(iq_buf: &[u8]) -> Vec<[u8; 14]> {
 
         outbuf.push(this_mag);
     }
-    dump1090_rs::demod_2400::demodulate2400(outbuf).unwrap()
+    dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap()
 }
 
 #[test]

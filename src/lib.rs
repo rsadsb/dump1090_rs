@@ -75,36 +75,3 @@ impl MagnitudeBuffer {
         self.length += 1;
     }
 }
-
-#[derive(Default)]
-pub struct Modes {
-    pub mag_buffer_a: MagnitudeBuffer,
-    pub mag_buffer_b: MagnitudeBuffer,
-    pub use_buffer_a_next: bool,
-}
-
-impl Modes {
-    pub fn next_buffer(&mut self, fs: usize) -> MagnitudeBuffer {
-        let (mut next, other) = if self.use_buffer_a_next {
-            // Switch the active buffer for the next call
-            self.use_buffer_a_next = false;
-
-            (self.mag_buffer_a, self.mag_buffer_b)
-        } else {
-            // Switch the active buffer for the next call
-            self.use_buffer_a_next = true;
-
-            (self.mag_buffer_b, self.mag_buffer_a)
-        };
-
-        next.first_sample_timestamp_12mhz =
-            other.first_sample_timestamp_12mhz + ((12_000_000 * other.length) / fs);
-        if other.length > 0 {
-            let n = other.length;
-            next.data[..TRAILING_SAMPLES].clone_from_slice(&other.data[(n - TRAILING_SAMPLES)..n]);
-        };
-        next.length = 0;
-
-        next
-    }
-}
