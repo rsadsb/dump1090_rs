@@ -1,5 +1,5 @@
 use byteorder::{BigEndian, ReadBytesExt};
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::io::Cursor;
 
 fn demod_iq(iq_buf: &[u8]) -> Vec<[u8; 14]> {
