@@ -1,17 +1,14 @@
-lazy_static::lazy_static! {
-    static ref MODES: Mutex<dump1090_rs::Modes> = Mutex::new(dump1090_rs::Modes::default());
-}
-
-use std::net::TcpListener;
-
+// std
 use std::io::prelude::*;
 use std::io::Cursor;
-use std::sync::Mutex;
+use std::net::TcpListener;
 
+// third-party
 use byteorder::{BigEndian, ReadBytesExt};
 use clap::App;
 
-use dump1090_rs::{rtlsdr, MODES_MAG_BUF_SAMPLES};
+// crate
+use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
 
 fn main() -> Result<(), &'static str> {
     let _matches = App::new("Rust dump1090")
@@ -21,8 +18,6 @@ fn main() -> Result<(), &'static str> {
 
     let mut f_buffer: [u8; 2 * MODES_MAG_BUF_SAMPLES] = [0_u8; 2 * MODES_MAG_BUF_SAMPLES];
     let mut active: bool = true;
-
-    let fs: usize = 2_400_000;
 
     let mut dev = rtlsdr::RtlSdrDevice::new(0)?;
 
@@ -66,53 +61,51 @@ fn main() -> Result<(), &'static str> {
         if let Ok((s, _addr)) = listener.accept() {
             sockets.push(s);
         }
-        if let Ok(mut modes) = MODES.lock() {
-            let outbuf = &mut modes.next_buffer(fs);
 
-            let read_result = dev.read(&mut f_buffer);
-            match read_result {
-                Err(_) | Ok(0) => active = false,
-                Ok(n) => {
-                    // un-comment this for creating test data
-                    //std::fs::write("test_01.iq", &f_buffer[..n]);
-                    let mut rdr = Cursor::new(&f_buffer[..n]);
+        let mut outbuf = MagnitudeBuffer::default();
+        let read_result = dev.read(&mut f_buffer);
+        match read_result {
+            Err(_) | Ok(0) => active = false,
+            Ok(n) => {
+                // un-comment this for creating test data
+                //std::fs::write("test_01.iq", &f_buffer[..n]);
+                let mut rdr = Cursor::new(&f_buffer[..n]);
 
-                    while let Ok(iq) = rdr.read_u16::<BigEndian>() {
-                        let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
+                while let Ok(iq) = rdr.read_u16::<BigEndian>() {
+                    let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
 
-                        outbuf.push(this_mag);
+                    outbuf.push(this_mag);
+                }
+            }
+        }
+
+        let resulting_data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+        if !resulting_data.is_empty() {
+            println!("{:x?}", resulting_data);
+            let resulting_data: Vec<String> = resulting_data
+                .iter()
+                .map(|a| {
+                    let a = hex::encode(a);
+                    format!("*{};\n", a)
+                })
+                .collect();
+
+            let mut remove_indexs = vec![];
+            for (i, mut socket) in &mut sockets.iter().enumerate() {
+                for msg in &resulting_data {
+                    // write, or add to remove list if ConnectionReset
+                    if let Err(e) = socket.write_all(msg.as_bytes()) {
+                        if e.kind() == std::io::ErrorKind::ConnectionReset {
+                            remove_indexs.push(i);
+                            break;
+                        }
                     }
                 }
             }
 
-            let resulting_data = dump1090_rs::demod_2400::demodulate2400(outbuf).unwrap();
-            if !resulting_data.is_empty() {
-                println!("{:x?}", resulting_data);
-                let resulting_data: Vec<String> = resulting_data
-                    .iter()
-                    .map(|a| {
-                        let a = hex::encode(a);
-                        format!("*{};\n", a)
-                    })
-                    .collect();
-
-                let mut remove_indexs = vec![];
-                for (i, mut socket) in &mut sockets.iter().enumerate() {
-                    for msg in &resulting_data {
-                        // write, or add to remove list if ConnectionReset
-                        if let Err(e) = socket.write_all(msg.as_bytes()) {
-                            if e.kind() == std::io::ErrorKind::ConnectionReset {
-                                remove_indexs.push(i);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // remove
-                for i in remove_indexs {
-                    sockets.remove(i);
-                }
+            // remove
+            for i in remove_indexs {
+                sockets.remove(i);
             }
         }
     }
