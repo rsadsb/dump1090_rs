@@ -81,12 +81,13 @@ fn main() -> Result<(), &'static str> {
 
         let resulting_data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
         if !resulting_data.is_empty() {
-            println!("{:x?}", resulting_data);
             let resulting_data: Vec<String> = resulting_data
                 .iter()
                 .map(|a| {
                     let a = hex::encode(a);
-                    format!("*{};\n", a)
+                    let a = format!("*{};\n", a);
+                    println!("{}", &a[..a.len() - 1]);
+                    a
                 })
                 .collect();
 
