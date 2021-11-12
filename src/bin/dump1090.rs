@@ -5,16 +5,29 @@ use std::net::TcpListener;
 
 // third-party
 use byteorder::{BigEndian, ReadBytesExt};
-use clap::App;
+use clap::Parser;
 
 // crate
 use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
 
+#[derive(Debug, Parser)]
+#[clap(
+    version,
+    name = "dump1090_rs",
+    author = "wcampbell0x2a",
+    about = "ADS-B Demodulator and Server"
+)]
+struct Options {
+    /// ip address
+    #[clap(long, default_value = "localhost")]
+    host: String,
+    /// port
+    #[clap(long, default_value = "30002")]
+    port: u16,
+}
+
 fn main() -> Result<(), &'static str> {
-    let _matches = App::new("Rust dump1090")
-        .version(clap::crate_version!())
-        .author("John Stanford (johnwstanford@gmail.com)")
-        .about("Translation of dump1090-mutability into Rust, intended to match bit-for-bit");
+    let options = Options::parse();
 
     let mut f_buffer: [u8; 2 * MODES_MAG_BUF_SAMPLES] = [0_u8; 2 * MODES_MAG_BUF_SAMPLES];
     let mut active: bool = true;
@@ -50,7 +63,7 @@ fn main() -> Result<(), &'static str> {
 
     dev.reset_buffer()?;
 
-    let listener = TcpListener::bind("127.0.0.1:30002").unwrap();
+    let listener = TcpListener::bind((options.host, options.port)).unwrap();
     listener
         .set_nonblocking(true)
         .expect("Cannot set non-blocking");
