@@ -6,8 +6,8 @@ use std::sync::Mutex;
 const ICAO_FILTER_SIZE: u32 = 4096;
 
 lazy_static! {
-    static ref ICAO_FILTER_A: Mutex<Vec<u32>> = Mutex::new(vec![0; 4096]);
-    static ref ICAO_FILTER_B: Mutex<Vec<u32>> = Mutex::new(vec![0; 4096]);
+    static ref ICAO_FILTER_A: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
+    static ref ICAO_FILTER_B: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
 }
 
 pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
