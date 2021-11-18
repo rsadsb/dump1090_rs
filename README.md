@@ -17,7 +17,7 @@ cargo t --release
 
 ## Benchmark
 
-Reading from a 256KB iq sample to ADS-B bytes takes ~3.5218 ms, but feel free to run benchmarks on your computer.
+Reading from a 256KB iq sample to ADS-B bytes takes ~3.3 ms, but feel free to run benchmarks on your computer.
 ```
 cargo bench
 ```

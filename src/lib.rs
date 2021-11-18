@@ -26,9 +26,10 @@ const MODES_LONG_MSG_BYTES: usize = 14;
 const MODES_SHORT_MSG_BYTES: usize = 7;
 
 lazy_static! {
-    pub static ref MAG_LUT: Vec<u16> = {
-        let mut ans: Vec<u16> = vec![];
+    pub static ref MAG_LUT: [u16; 256 * 256] = {
+        let mut ans: [u16; 256 * 256] = [0u16; 256 * 256];
 
+        let mut index = 0;
         for i in 0..256 {
             for q in 0..256 {
                 let fi = (i as f32 - 127.5) / 127.5;
@@ -43,10 +44,10 @@ lazy_static! {
 
                 let mag: u16 = mag_f32_rounded as u16;
 
-                ans.push(mag);
+                ans[index] = mag;
+                index += 1;
             }
         }
-
         ans
     };
 }
