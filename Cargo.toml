@@ -20,3 +20,6 @@ criterion = "0.3"
 [[bench]]
 name = "demod_benchmark"
 harness = false
+
+[profile.release]
+lto = true
