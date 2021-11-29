@@ -24,8 +24,8 @@ cargo bench
 
 ### Performance tricks
 
-To enable maximum performance, instruct rustc not to use cross cpu features only.
-This gives around a .1% speedup in my tests.
+To enable maximum performance, instruct rustc to use features specific to your cpu.
+This gives around a .1% speedup in my tests because of AVX instruction usage.
 ```
 RUSTFLAGS="-C target-cpu=native" cargo r --release
 ```
