@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v0.4.0] 2021-12-08
+- 9% speed increases in benchmarks.
+- Add `--host` and `--port` for control of TCP server.
+
 ## [v0.2.0] 2021-10-31
 - Add tests
 - Add benchmarks
