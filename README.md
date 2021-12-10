@@ -4,6 +4,8 @@
 Fork of https://github.com/johnwstanford/dump1090_rs, without parsing messages.
 This project is meant to just forward bytes from the the demodulated iq stream from a rtlsdr to my own [adsb_deku](https://github.com/wcampbell0x2a/adsb_deku) library/apps.
 
+See [rsadsb-blog](https://rsadsb.github.io/) for release details.
+
 ## Usage
 
 ```
