@@ -202,9 +202,9 @@ impl std::io::Read for RtlSdrDevice {
 
 #[derive(Debug)]
 pub struct UsbStrings {
-    manufacturer: String,
-    product: String,
-    serial: String,
+    pub manufacturer: String,
+    pub product: String,
+    pub serial: String,
 }
 
 #[must_use]
