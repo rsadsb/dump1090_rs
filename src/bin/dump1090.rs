@@ -1,14 +1,13 @@
 // std
 use std::io::prelude::*;
-use std::io::Cursor;
 use std::net::{Ipv4Addr, TcpListener};
 
 // third-party
-use byteorder::{BigEndian, ReadBytesExt};
 use clap::Parser;
+use num_complex::Complex;
 
 // crate
-use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
+use dump1090_rs::utils;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -24,45 +23,53 @@ struct Options {
     /// port
     #[clap(long, default_value = "30002")]
     port: u16,
+    /// soapysdr driver (sdr device)
+    /// TODO: add options
+    #[clap(long, default_value = "rtlsdr")]
+    driver: String,
 }
 
+// TODO: load these from a toml file
+const RTLSDR_GAINS: &[(&str, f64)] = &[("TUNER", 49.6)];
+const HACKRF_GAINS: &[(&str, f64)] = &[("LNA", 40.0), ("VGA", 52.0)];
+
 fn main() -> Result<(), &'static str> {
+    // parse opts
     let options = Options::parse();
 
-    let mut f_buffer: [u8; 2 * MODES_MAG_BUF_SAMPLES] = [0_u8; 2 * MODES_MAG_BUF_SAMPLES];
-    let mut active: bool = true;
+    // setup soapysdr
+    let d = soapysdr::Device::new(&*format!("driver={}", options.driver)).unwrap();
+    let channel = 0;
 
-    let mut dev = rtlsdr::RtlSdrDevice::new(0)?;
+    d.set_frequency(soapysdr::Direction::Rx, channel, 1_090_000_000.0, ())
+        .unwrap();
+    println!("{:?}", d.frequency(soapysdr::Direction::Rx, channel));
 
-    let available_gains = dev.get_tuner_gains()?;
-    eprintln!("Available gains: {:?}", available_gains);
+    d.set_sample_rate(soapysdr::Direction::Rx, channel, 2_400_000.0)
+        .unwrap();
+    println!("{:?}", d.sample_rate(soapysdr::Direction::Rx, 0));
 
-    let max_gain: i32 = *(available_gains.iter().max().unwrap());
-    eprintln!("Max available gain: {:.1} [dB]", (max_gain as f32) * 0.1);
+    println!("{:?}", d.list_gains(soapysdr::Direction::Rx, 0).unwrap());
+    //d.set_gain_mode(soapysdr::Direction::Rx, channel, true).unwrap();
 
-    dev.set_tuner_gain_mode(1)?;
-    dev.set_tuner_gain(max_gain)?;
-    if dev.set_freq_correction(0).is_err() {
-        // For some reason, this function returns -2 when we set the frequency correction to 0
-        // The same thing happens in dump1090, but the return value is never checked
-        eprintln!("Warning: Nonzero return value from set_freq_correction");
+    let gains = match options.driver.as_ref() {
+        "rtlsdr" => RTLSDR_GAINS,
+        "hackrf" => HACKRF_GAINS,
+        _ => unreachable!(),
+    };
+
+    for gain in gains {
+        let (name, val) = gain;
+        d.set_gain_element(soapysdr::Direction::Rx, channel, *name, *val)
+            .unwrap();
     }
-    dev.set_center_freq(1_090_000_000)?;
-    dev.set_sample_rate(2_400_000)?;
 
-    eprintln!("Set center freq to {:.4e} [Hz]", dev.get_center_freq()?);
-    eprintln!(
-        "Set freq correction to {} [ppm]",
-        dev.get_freq_correction()?
-    );
-    eprintln!(
-        "Set tuner gain to {:.1} [dB]",
-        (dev.get_tuner_gain()? as f32) * 0.1
-    );
-    eprintln!("Set sample rate to {}", dev.get_sample_rate()?);
+    let mut stream = d.rx_stream::<Complex<i16>>(&[channel]).unwrap();
 
-    dev.reset_buffer()?;
+    let mut buf = vec![Complex::new(0, 0); stream.mtu().unwrap()];
+    stream.activate(None).unwrap();
 
+    // bind to listener port
     let listener = TcpListener::bind((options.host, options.port)).unwrap();
     listener
         .set_nonblocking(true)
@@ -70,59 +77,45 @@ fn main() -> Result<(), &'static str> {
 
     let mut sockets = vec![];
 
-    while active {
+    loop {
         if let Ok((s, _addr)) = listener.accept() {
             sockets.push(s);
         }
 
-        let mut outbuf = MagnitudeBuffer::default();
-        let read_result = dev.read(&mut f_buffer);
-        match read_result {
-            Err(_) | Ok(0) => active = false,
-            Ok(n) => {
-                // un-comment this for creating test data
-                //std::fs::write("test_01.iq", &f_buffer[..n]);
-                let mut rdr = Cursor::new(&f_buffer[..n]);
+        if let Ok(len) = stream.read(&[&mut buf], 5_000_000) {
+            //utils::save_test_data(&buf[..len]);
+            let buf = &buf[..len];
+            let outbuf = utils::to_mag(buf);
+            let resulting_data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+            if !resulting_data.is_empty() {
+                let resulting_data: Vec<String> = resulting_data
+                    .iter()
+                    .map(|a| {
+                        let a = hex::encode(a);
+                        let a = format!("*{};\n", a);
+                        println!("{}", &a[..a.len() - 1]);
+                        a
+                    })
+                    .collect();
 
-                while let Ok(iq) = rdr.read_u16::<BigEndian>() {
-                    let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
-
-                    outbuf.push(this_mag);
-                }
-            }
-        }
-
-        let resulting_data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
-        if !resulting_data.is_empty() {
-            let resulting_data: Vec<String> = resulting_data
-                .iter()
-                .map(|a| {
-                    let a = hex::encode(a);
-                    let a = format!("*{};\n", a);
-                    println!("{}", &a[..a.len() - 1]);
-                    a
-                })
-                .collect();
-
-            let mut remove_indexs = vec![];
-            for (i, mut socket) in &mut sockets.iter().enumerate() {
-                for msg in &resulting_data {
-                    // write, or add to remove list if ConnectionReset
-                    if let Err(e) = socket.write_all(msg.as_bytes()) {
-                        if e.kind() == std::io::ErrorKind::ConnectionReset {
-                            remove_indexs.push(i);
-                            break;
+                let mut remove_indexs = vec![];
+                for (i, mut socket) in &mut sockets.iter().enumerate() {
+                    for msg in &resulting_data {
+                        // write, or add to remove list if ConnectionReset
+                        if let Err(e) = socket.write_all(msg.as_bytes()) {
+                            if e.kind() == std::io::ErrorKind::ConnectionReset {
+                                remove_indexs.push(i);
+                                break;
+                            }
                         }
                     }
                 }
-            }
 
-            // remove
-            for i in remove_indexs {
-                sockets.remove(i);
+                // remove
+                for i in remove_indexs {
+                    sockets.remove(i);
+                }
             }
         }
     }
-
-    Ok(())
 }

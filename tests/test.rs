@@ -1,77 +1,53 @@
-// std
-use std::io::Cursor;
-
 // third-part
 use assert_hex::assert_eq_hex;
-use byteorder::{BigEndian, ReadBytesExt};
+use hexlit::hex;
 
 // crate
-use dump1090_rs::MagnitudeBuffer;
+use dump1090_rs::utils;
 
-fn demod_iq(iq_buf: &[u8]) -> Vec<[u8; 14]> {
-    let mut outbuf = MagnitudeBuffer::default();
+fn routine(filename: &str, expected_data: &Vec<[u8; 14]>) {
+    let buf = utils::read_test_data(filename);
+    let outbuf = utils::to_mag(&buf);
 
-    let mut rdr = Cursor::new(&iq_buf);
-
-    while let Ok(iq) = rdr.read_u16::<BigEndian>() {
-        let this_mag: u16 = dump1090_rs::MAG_LUT[iq as usize];
-
-        outbuf.push(this_mag);
-    }
-    dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap()
-}
-
-#[test]
-fn test_00() {
-    let f_buffer = std::fs::read("tests/test_00.iq").unwrap();
-    let resulting_data = demod_iq(&f_buffer);
-    let expected_data = [[
-        0x8d, 0xa6, 0xd8, 0x57, 0xf8, 0x21, 0x0, 0x02, 0x00, 0x4a, 0xb8, 0xaa, 0xea, 0xdc,
-    ]];
-    assert_eq_hex!(expected_data, &*resulting_data);
+    let data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+    assert_eq_hex!(expected_data, &*data);
 }
 
 #[test]
 fn test_01() {
-    let f_buffer = std::fs::read("tests/test_01.iq").unwrap();
-    let resulting_data = demod_iq(&f_buffer);
-    let expected_data = [
-        [
-            0x8d, 0xac, 0x74, 0x1c, 0xea, 0x48, 0x58, 0x64, 0x89, 0x3c, 0x8, 0xc8, 0xd2, 0x9e,
-        ],
-        [
-            0x5d, 0xab, 0x1c, 0x04, 0x1b, 0xfb, 0x6b, 0x8b, 0x5a, 0x9c, 0xd9, 0xd3, 0x90, 0xe1,
-        ],
-        [
-            0x8d, 0xac, 0x74, 0x1c, 0x58, 0xbf, 0x06, 0x23, 0x34, 0xe7, 0x67, 0x0c, 0x72, 0x50,
-        ],
-        [
-            0x8f, 0xc0, 0x51, 0xe8, 0xf8, 0x03, 0x00, 0x06, 0x00, 0x5a, 0xbc, 0x45, 0xa4, 0x5f,
-        ],
-    ];
-    assert_eq_hex!(expected_data, &*resulting_data);
+    let filename = "test_iq/test_1641427457780.iq";
+    let expected_data = Vec::from([
+        hex!("8dad929358b9c6273f002169c02e"),
+        hex!("8daa2bc4f82100020049b8db9449"),
+        hex!("8daa2bc4f82100020049b8db9449"),
+        hex!("8da0aaa058bf163fcf860013e840"),
+    ]);
+    routine(filename, &expected_data);
 }
 
 #[test]
 fn test_02() {
-    let f_buffer = std::fs::read("tests/test_02.iq").unwrap();
-    let resulting_data = demod_iq(&f_buffer);
-    let expected_data = [
-        [
-            0x8d, 0xaa, 0x5d, 0x2e, 0x99, 0x0d, 0xa1, 0x05, 0xb0, 0x04, 0x4e, 0xb3, 0xf9, 0x8d,
-        ],
-        [
-            0x8d, 0xa1, 0x3f, 0x12, 0x99, 0x0c, 0x50, 0x03, 0x68, 0x10, 0x0b, 0x0a, 0xe9, 0x85,
-        ],
-        [
-            0x5d, 0x3c, 0x4e, 0xc7, 0x76, 0xb0, 0xb1, 0xc5, 0x12, 0xe2, 0xb1, 0x6e, 0x6b, 0xb4,
-        ],
-        [
-            0x5d, 0x3c, 0x4e, 0xc7, 0x76, 0xb0, 0xb1, 0xc7, 0x32, 0xe2, 0x91, 0x6e, 0x63, 0xb6,
-        ],
-        [
-            0x8d, 0xa1, 0x3f, 0x12, 0x59, 0x2c, 0x02, 0x58, 0x42, 0x69, 0xf4, 0x0f, 0x5b, 0x7d,
-        ],
-    ];
-    assert_eq_hex!(expected_data, &*resulting_data);
+    let filename = "test_iq/test_1641428165033.iq";
+    let expected_data = Vec::from([
+        hex!("8da79de99909932f780c9e2f2f8f"),
+        hex!("8dac04d358a7820a86ac3709e689"),
+        hex!("8dac04d3ea4288669b5c082751d4"),
+        hex!("8da79de958bdf59c85104874adad"),
+        hex!("5dad92936265f525be017735997b"),
+    ]);
+    routine(filename, &expected_data);
+}
+
+#[test]
+fn test_03() {
+    let filename = "test_iq/test_1641428106243.iq";
+    let expected_data = Vec::from([
+        hex!("8da8aac8990c30b51808aa24e573"),
+        hex!("8dada6b9990cf61e4848af2a8656"),
+        hex!("8da4ba025885462008fa0a4a6eb2"),
+        hex!("8da4ba025885462008fa0a4a6eb2"),
+        hex!("8da4ba0299115f301074a72db6ff"),
+    ]);
+
+    routine(filename, &expected_data);
 }

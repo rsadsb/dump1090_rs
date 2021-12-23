@@ -1,15 +1,54 @@
 # dump1090_rs
 [![Actions Status](https://github.com/rsadsb/dump1090_rs/workflows/CI/badge.svg)](https://github.com/rsadsb/dump1090_rs/actions)
 
-Fork of https://github.com/johnwstanford/dump1090_rs, without parsing messages.
-This project is meant to just forward bytes from the the demodulated iq stream from a rtlsdr to my own [adsb_deku](https://github.com/rsadsb/adsb_deku) library/apps.
+Demodulate a ADS-B signal from a software defined radio device tuned at 1090mhz and
+forward the bytes to applications such as [adsb_deku](https://github.com/rsadsb/adsb_deku).
 
 See [rsadsb-blog](https://rsadsb.github.io/) for release details.
 
-## Usage
+## Tested Support
 
+Through the use of the [rust-soapysdr](https://github.com/kevinmehall/rust-soapysdr) project,
+we support [many different](https://github.com/pothosware/SoapySDR/wiki) software defined radio devices.
+If you have tested this project on devices not listed below, let me know!
+(you will need to add gain settings to `src/bin/dump1090.rs`)
+
+| Device | Supported/Tested | Recommend | argument          |
+| ------ | :--------------: | :-------: | ----------------- |
+| rtlsdr |        x         |     x     | `--driver rtlsdr` |
+| HackRF |        x         |           | `--driver hackrf` |
+
+
+## Usage
+**Minimum Supported Rust Version**: 1.56.1.
+
+### run
 ```
 cargo r --release
+```
+
+### help
+```
+dump1090_rs 0.5.0
+wcampbell0x2a
+ADS-B Demodulator and Server
+
+USAGE:
+    dump1090 [OPTIONS]
+
+OPTIONS:
+        --driver <DRIVER>    soapysdr driver (sdr device) TODO: add options [default: rtlsdr]
+    -h, --help               Print help information
+        --host <HOST>        ip address [default: 127.0.0.1]
+        --port <PORT>        port [default: 30002]
+    -V, --version            Print version information
+```
+
+## Performance tricks
+
+To enable maximum performance, instruct rustc to use features specific to your cpu.
+```
+RUSTFLAGS="-C target-cpu=native" cargo r --release
 ```
 
 ## Testing
@@ -19,42 +58,24 @@ cargo t --release
 
 ## Benchmark
 
-Reading from a 256KB iq sample to ADS-B bytes takes ~3.2 ms, but feel free to run benchmarks on your computer.
+Reading from a 512KB iq sample to ADS-B bytes takes ~3.3 ms, but feel free to run benchmarks on your computer.
 ```
-cargo bench
-```
-
-### Performance tricks
-
-To enable maximum performance, instruct rustc to use features specific to your cpu.
-This gives around a .1% speedup in my tests because of AVX instruction usage.
-```
-RUSTFLAGS="-C target-cpu=native" cargo r --release
+RUSTFLAGS="-C target-cpu=native" cargo bench
 ```
 
-#### lscpu
+### Faster hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
 ```
-> lscpu
-Architecture:            x86_64
-  CPU op-mode(s):        32-bit, 64-bit
-  Address sizes:         39 bits physical, 48 bits virtual
-  Byte Order:            Little Endian
-CPU(s):                  8
-  On-line CPU(s) list:   0-7
-Vendor ID:               GenuineIntel
-  Model name:            Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
-    CPU family:          6
-    Model:               158
-    Thread(s) per core:  2
-    Core(s) per socket:  4
-    Socket(s):           1
-    Stepping:            9
-    CPU max MHz:         4500.0000
-    CPU min MHz:         800.0000
-    BogoMIPS:            8403.00
-    Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid
-                         aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti tpr_shadow vnmi fle
-                         xpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp
+01                      time:   [3.4230 ms 3.4274 ms 3.4322 ms]
+02                      time:   [3.3413 ms 3.3452 ms 3.3492 ms]
+03                      time:   [3.2562 ms 3.2597 ms 3.2635 ms]
+```
+
+
+### Slower hardware: Intel(R) Core(TM) i5-6300U CPU @ 2.40GHz
+```
+01                      time:   [5.7163 ms 5.7744 ms 5.8373 ms]
+02                      time:   [5.5845 ms 5.6405 ms 5.7018 ms]
+03                      time:   [5.4486 ms 5.5052 ms 5.5655 ms]
 ```
 
 # Changes
