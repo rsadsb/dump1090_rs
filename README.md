@@ -1,8 +1,8 @@
 # dump1090_rs
-[![Actions Status](https://github.com/wcampbell0x2a/dump1090_rs/workflows/CI/badge.svg)](https://github.com/wcampbell0x2a/dump1090_rs/actions)
+[![Actions Status](https://github.com/rsadsb/dump1090_rs/workflows/CI/badge.svg)](https://github.com/rsadsb/dump1090_rs/actions)
 
 Fork of https://github.com/johnwstanford/dump1090_rs, without parsing messages.
-This project is meant to just forward bytes from the the demodulated iq stream from a rtlsdr to my own [adsb_deku](https://github.com/wcampbell0x2a/adsb_deku) library/apps.
+This project is meant to just forward bytes from the the demodulated iq stream from a rtlsdr to my own [adsb_deku](https://github.com/rsadsb/adsb_deku) library/apps.
 
 See [rsadsb-blog](https://rsadsb.github.io/) for release details.
 
@@ -58,4 +58,4 @@ Vendor ID:               GenuineIntel
 ```
 
 # Changes
-See [CHANGELOG.md](https://github.com/wcampbell0x2a/dump1090_rs/blob/master/CHANGELOG.md)
+See [CHANGELOG.md](https://github.com/rsadsb/dump1090_rs/blob/master/CHANGELOG.md)
