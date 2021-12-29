@@ -1,7 +1,7 @@
 // std
 use std::io::prelude::*;
 use std::io::Cursor;
-use std::net::TcpListener;
+use std::net::{Ipv4Addr, TcpListener};
 
 // third-party
 use byteorder::{BigEndian, ReadBytesExt};
@@ -19,8 +19,8 @@ use dump1090_rs::{rtlsdr, MagnitudeBuffer, MODES_MAG_BUF_SAMPLES};
 )]
 struct Options {
     /// ip address
-    #[clap(long, default_value = "localhost")]
-    host: String,
+    #[clap(long, default_value = "127.0.0.1")]
+    host: Ipv4Addr,
     /// port
     #[clap(long, default_value = "30002")]
     port: u16,
