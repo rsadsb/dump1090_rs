@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 byteorder = "1.4"
-clap = {version = "3.0.0-rc.0", features = ["color", "derive"]}
+clap = {version = "3.0.0", features = ["color", "derive", "wrap_help"]}
 lazy_static = "1.4"
 libc = "0.2"
 hex = "0.4"
