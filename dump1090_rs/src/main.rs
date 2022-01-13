@@ -7,7 +7,7 @@ use clap::Parser;
 use num_complex::Complex;
 
 // crate
-use dump1090_rs::utils;
+use libdump1090_rs::utils;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -86,7 +86,7 @@ fn main() -> Result<(), &'static str> {
             //utils::save_test_data(&buf[..len]);
             let buf = &buf[..len];
             let outbuf = utils::to_mag(buf);
-            let resulting_data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+            let resulting_data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
             if !resulting_data.is_empty() {
                 let resulting_data: Vec<String> = resulting_data
                     .iter()

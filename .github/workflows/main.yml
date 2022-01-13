@@ -19,22 +19,6 @@ jobs:
           command: build
           args: --all
 
-  check-examples:
-    name: Build Examples
-    runs-on: ubuntu-latest
-    steps:
-      - run: sudo apt-get install librtlsdr-dev
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --examples
-
   test:
     name: Test Suite
     runs-on: ubuntu-latest
