@@ -5,7 +5,7 @@ use hexlit::hex;
 // crate
 use libdump1090_rs::utils;
 
-fn routine(filename: &str, expected_data: &Vec<[u8; 14]>) {
+fn routine(filename: &str, expected_data: &[[u8; 14]]) {
     let buf = utils::read_test_data(filename);
     let outbuf = utils::to_mag(&buf);
 

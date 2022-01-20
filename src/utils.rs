@@ -19,6 +19,7 @@ pub fn save_test_data(data: &[Complex<i16>]) {
     }
 }
 
+#[must_use]
 pub fn read_test_data(filepath: &str) -> [Complex<i16>; 0x20000] {
     let mut file = std::fs::File::open(filepath).unwrap();
     let mut r_buf = [Complex::new(0, 0); 0x20000];
@@ -38,6 +39,7 @@ pub fn read_test_data(filepath: &str) -> [Complex<i16>; 0x20000] {
     r_buf
 }
 
+#[must_use]
 pub fn to_mag(data: &[Complex<i16>]) -> MagnitudeBuffer {
     let mut outbuf = MagnitudeBuffer::default();
     for b in data {
@@ -45,12 +47,12 @@ pub fn to_mag(data: &[Complex<i16>]) -> MagnitudeBuffer {
         let i = b.im;
         let q = b.re;
 
-        let fi = i as f32 / (1 << 15) as f32;
-        let fq = q as f32 / (1 << 15) as f32;
+        let fi = f32::from(i) / (1 << 15) as f32;
+        let fq = f32::from(q) / (1 << 15) as f32;
 
         let mag_sqr = fi * fi + fq * fq;
         let mag = f32::sqrt(mag_sqr);
-        outbuf.push((mag * u16::MAX as f32 + 0.5) as u16);
+        outbuf.push((mag * f32::from(u16::MAX) + 0.5) as u16);
     }
     outbuf
 }
