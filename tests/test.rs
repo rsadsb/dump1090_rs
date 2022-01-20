@@ -3,13 +3,13 @@ use assert_hex::assert_eq_hex;
 use hexlit::hex;
 
 // crate
-use dump1090_rs::utils;
+use libdump1090_rs::utils;
 
 fn routine(filename: &str, expected_data: &Vec<[u8; 14]>) {
     let buf = utils::read_test_data(filename);
     let outbuf = utils::to_mag(&buf);
 
-    let data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+    let data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
     assert_eq_hex!(expected_data, &*data);
 }
 
