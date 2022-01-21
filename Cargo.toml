@@ -1,6 +1,6 @@
 [package]
-name = "dump1090_rs"
-version = "0.4.0"
+name = "libdump1090_rs"
+version = "0.5.0"
 authors = ["Wayne Campbell <wcampbell1995@gmail","John Stanford <johnwstanford@gmail.com>"]
 edition = "2021"
 
@@ -8,10 +8,10 @@ edition = "2021"
 
 [dependencies]
 byteorder = "1.4"
-clap = {version = "3.0.0", features = ["color", "derive", "wrap_help"]}
 lazy_static = "1.4"
 libc = "0.2"
-hex = "0.4"
+num-complex = "0.4"
+hexlit = "0.5.0"
 
 [dev-dependencies]
 assert_hex = "0.2"
@@ -23,3 +23,7 @@ harness = false
 
 [profile.release]
 lto = true
+
+[workspace]
+members = ["dump1090_rs"]
+default-members = ["dump1090_rs"]

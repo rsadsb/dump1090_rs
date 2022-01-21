@@ -12,7 +12,9 @@ use lazy_static::lazy_static;
 
 // public
 pub mod demod_2400;
-pub mod rtlsdr;
+
+// public(crate)
+pub mod utils;
 
 // private
 mod crc;
