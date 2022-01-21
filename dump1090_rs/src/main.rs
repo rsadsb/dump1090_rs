@@ -56,7 +56,6 @@ fn main() -> Result<(), &'static str> {
     println!("{:?}", d.list_gains(soapysdr::Direction::Rx, 0).unwrap());
     //d.set_gain_mode(soapysdr::Direction::Rx, channel, true).unwrap();
 
-
     for gain in gains {
         let (name, val) = gain;
         d.set_gain_element(soapysdr::Direction::Rx, channel, *name, *val)
