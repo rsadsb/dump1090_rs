@@ -1,6 +1,3 @@
-// std
-use std::io::Cursor;
-
 // third-party
 use assert_hex::assert_eq_hex;
 use criterion::{criterion_group, criterion_main, Criterion};
@@ -8,12 +5,11 @@ use hexlit::hex;
 use num_complex::Complex;
 
 // crate
-use dump1090_rs::utils;
-use dump1090_rs::MagnitudeBuffer;
+use libdump1090_rs::utils;
 
 fn routine(data: [Complex<i16>; 0x20000], expected_data: &Vec<[u8; 14]>) {
     let outbuf = utils::to_mag(&data);
-    let data = dump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+    let data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
     assert_eq_hex!(expected_data, &*data);
 }
 

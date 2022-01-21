@@ -62,14 +62,14 @@ To enable maximum performance, instruct rustc to use features specific to your c
 
 ## Testing
 ```
-> cargo t --release
+> cargo t --workspace --release
 ```
 
 ## Benchmark
 
 Reading from a 512KB iq sample to ADS-B bytes takes ~3.3 ms, but feel free to run benchmarks on your computer.
 ```
-> RUSTFLAGS="-C target-cpu=native" cargo bench
+> RUSTFLAGS="-C target-cpu=native" cargo bench --workspace
 ```
 
 ### Faster hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
