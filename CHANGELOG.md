@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+- Support Multi SDRs with the help of soapysdr: [!10](https://github.com/rsadsb/dump1090_rs/pull/10)
 
 ## [v0.4.0] 2021-12-08
 - 9% speed increases in benchmarks.
