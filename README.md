@@ -22,9 +22,18 @@ If you have tested this project on devices not listed below, let me know!
 ## Usage
 **Minimum Supported Rust Version**: 1.56.1.
 
-### run
+### Build and Run
+
+Install soapysdr drivers.
+
+#### Ubuntu
 ```
-cargo r --release
+> apt install libsoapysdr-dev
+```
+
+Run the software using the default rtlsdr.
+```
+> cargo r --release
 ```
 
 ### help
@@ -37,7 +46,7 @@ USAGE:
     dump1090 [OPTIONS]
 
 OPTIONS:
-        --driver <DRIVER>    soapysdr driver (sdr device) TODO: add options [default: rtlsdr]
+        --driver <DRIVER>    soapysdr driver (sdr device)
     -h, --help               Print help information
         --host <HOST>        ip address [default: 127.0.0.1]
         --port <PORT>        port [default: 30002]
@@ -48,19 +57,19 @@ OPTIONS:
 
 To enable maximum performance, instruct rustc to use features specific to your cpu.
 ```
-RUSTFLAGS="-C target-cpu=native" cargo r --release
+> RUSTFLAGS="-C target-cpu=native" cargo r --release
 ```
 
 ## Testing
 ```
-cargo t --release
+> cargo t --release
 ```
 
 ## Benchmark
 
 Reading from a 512KB iq sample to ADS-B bytes takes ~3.3 ms, but feel free to run benchmarks on your computer.
 ```
-RUSTFLAGS="-C target-cpu=native" cargo bench
+> RUSTFLAGS="-C target-cpu=native" cargo bench
 ```
 
 ### Faster hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz

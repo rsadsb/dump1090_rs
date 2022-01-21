@@ -25,6 +25,5 @@ harness = false
 lto = true
 
 [workspace]
-members = [
-    "dump1090_rs"
-]
+members = ["dump1090_rs"]
+default-members = ["dump1090_rs"]

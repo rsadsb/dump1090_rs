@@ -24,18 +24,22 @@ struct Options {
     #[clap(long, default_value = "30002")]
     port: u16,
     /// soapysdr driver (sdr device)
-    /// TODO: add options
     #[clap(long, default_value = "rtlsdr")]
     driver: String,
 }
 
-// TODO: load these from a toml file
 const RTLSDR_GAINS: &[(&str, f64)] = &[("TUNER", 49.6)];
 const HACKRF_GAINS: &[(&str, f64)] = &[("LNA", 40.0), ("VGA", 52.0)];
 
 fn main() -> Result<(), &'static str> {
     // parse opts
     let options = Options::parse();
+
+    let gains = match options.driver.as_ref() {
+        "rtlsdr" => RTLSDR_GAINS,
+        "hackrf" => HACKRF_GAINS,
+        _ => panic!("unsupported driver"),
+    };
 
     // setup soapysdr
     let d = soapysdr::Device::new(&*format!("driver={}", options.driver)).unwrap();
@@ -52,11 +56,6 @@ fn main() -> Result<(), &'static str> {
     println!("{:?}", d.list_gains(soapysdr::Direction::Rx, 0).unwrap());
     //d.set_gain_mode(soapysdr::Direction::Rx, channel, true).unwrap();
 
-    let gains = match options.driver.as_ref() {
-        "rtlsdr" => RTLSDR_GAINS,
-        "hackrf" => HACKRF_GAINS,
-        _ => unreachable!(),
-    };
 
     for gain in gains {
         let (name, val) = gain;
