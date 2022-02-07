@@ -1,8 +1,9 @@
 # dump1090_rs
 [![Actions Status](https://github.com/rsadsb/dump1090_rs/workflows/CI/badge.svg)](https://github.com/rsadsb/dump1090_rs/actions)
+[![dependency status](https://deps.rs/repo/github/rsadsb/dump1090_rs/status.svg)](https://deps.rs/repo/github/rsadsb/dump1090_rs)
 
 Demodulate a ADS-B signal from a software defined radio device tuned at 1090mhz and
-forward the bytes to applications such as [adsb_deku](https://github.com/rsadsb/adsb_deku).
+forward the bytes to applications such as [adsb_deku/radar](https://github.com/rsadsb/adsb_deku).
 
 See [rsadsb-blog](https://rsadsb.github.io/) for release details.
 
@@ -22,15 +23,28 @@ If you have tested this project on devices not listed below, let me know!
 ## Usage
 **Minimum Supported Rust Version**: 1.56.1.
 
-### Build and Run
+## Build
 
-Install soapysdr drivers.
+Install `soapysdr` drivers.
 
-#### Ubuntu
+### Ubuntu
 ```
 > apt install libsoapysdr-dev
 ```
 
+### Cross Compile
+Use [hub.docker.com/r/rsadsb](https://hub.docker.com/r/rsadsb/ci/tags) for cross compiling to the following archs.
+These images already have `soapysdr` installed.
+```
+> cargo install cross
+> cross build --workspace --target x86_64-unknown-linux-gnu
+> cross build --workspace --target armv7-unknown-linux-gnueabihf
+```
+
+### Release Builds
+Check the [latest release](https://github.com/rsadsb/dump1090_rs/releases) for binaries built from the CI.
+
+## Run
 Run the software using the default rtlsdr.
 ```
 > cargo r --release

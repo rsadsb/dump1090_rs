@@ -1,0 +1,5 @@
+[target.armv7-unknown-linux-gnueabihf]
+image = "rsadsb/ci:0.1.0-armv7-unknown-linux-gnueabihf"
+
+[target.x86_64-unknown-linux-gnu]
+image = "rsadsb/ci:0.1.0-x86_64-unknown-linux-gnu"
