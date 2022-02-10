@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 - Support Multi SDRs with the help of soapysdr: [!10](https://github.com/rsadsb/dump1090_rs/pull/10)
+- Add CI builds for releases
 
 ## [v0.4.0] 2021-12-08
 - 9% speed increases in benchmarks.
