@@ -5,7 +5,9 @@
 Demodulate a ADS-B signal from a software defined radio device tuned at 1090mhz and
 forward the bytes to applications such as [adsb_deku/radar](https://github.com/rsadsb/adsb_deku).
 
-See [rsadsb-blog](https://rsadsb.github.io/) for release details.
+See [quistart-guide](https://rsadsb.github.io/quickstart.html) for a quick installation guide.
+
+See [rsadsb-blog](https://rsadsb.github.io/v0.5.0.html) for latest release details.
 
 ## Tested Support
 

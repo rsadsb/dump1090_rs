@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [v0.5.0] 2022-02-11
 - Support Multi SDRs with the help of soapysdr: [!10](https://github.com/rsadsb/dump1090_rs/pull/10)
 - Add CI builds for releases
+- Docker images for cross compiling are available at [hub.docker](https://hub.docker.com/r/rsadsb/ci/tags).
+- Binaries are available in Github Releases from the CI.
 
 ## [v0.4.0] 2021-12-08
 - 9% speed increases in benchmarks.
