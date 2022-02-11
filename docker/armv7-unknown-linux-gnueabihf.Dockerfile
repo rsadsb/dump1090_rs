@@ -3,6 +3,7 @@ FROM rustembedded/cross:armv7-unknown-linux-gnueabihf-0.2.1
 RUN \
     git clone https://github.com/pothosware/SoapySDR.git &&\
     cd SoapySDR &&\
+    git checkout soapy-sdr-0.8.1 &&\
     mkdir build &&\
     cd build &&\
     cmake \
