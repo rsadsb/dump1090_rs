@@ -1,6 +1,6 @@
 [package]
 name = "libdump1090_rs"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Wayne Campbell <wcampbell1995@gmail","John Stanford <johnwstanford@gmail.com>"]
 edition = "2021"
 

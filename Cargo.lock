@@ -381,7 +381,7 @@ checksum = "eef78b64d87775463c549fbd80e19249ef436ea3bf1de2a1eb7e717ec7fab1e9"
 
 [[package]]
 name = "libdump1090_rs"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "assert_hex",
  "byteorder",
