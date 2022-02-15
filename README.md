@@ -54,7 +54,7 @@ Run the software using the default rtlsdr.
 
 ### help
 ```
-dump1090_rs 0.5.0
+dump1090_rs 0.5.1
 wcampbell0x2a
 ADS-B Demodulator and Server
 
