@@ -1,0 +1,19 @@
+# Default gain values
+
+[[sdrs]]
+driver = "rtlsdr"
+
+[[sdrs.gain]]
+name = "TUNER"
+value = 49.6
+
+[[sdrs]]
+driver = "hackrf"
+
+[[sdrs.gain]]
+name = "LNA"
+value = 40.0
+
+[[sdrs.gain]]
+name = "VGA"
+value = 52.0

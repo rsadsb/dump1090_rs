@@ -261,13 +261,15 @@ dependencies = [
 
 [[package]]
 name = "dump1090_rs"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "clap 3.0.10",
  "hex",
  "libdump1090_rs",
  "num-complex",
+ "serde",
  "soapysdr",
+ "toml",
 ]
 
 [[package]]
@@ -654,6 +656,9 @@ name = "serde"
 version = "1.0.133"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97565067517b60e2d1ea8b268e59ce036de907ac523ad83a0475da04e818989a"
+dependencies = [
+ "serde_derive",
+]
 
 [[package]]
 name = "serde_cbor"
@@ -777,6 +782,15 @@ checksum = "be4d6b5f19ff7664e8c98d03e2139cb510db9b0a60b55f8e8709b689d939b6bc"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
