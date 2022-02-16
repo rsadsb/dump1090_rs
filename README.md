@@ -7,14 +7,14 @@ forward the bytes to applications such as [adsb_deku/radar](https://github.com/r
 
 See [quickstart-guide](https://rsadsb.github.io/quickstart.html) for a quick installation guide.
 
-See [rsadsb-blog](https://rsadsb.github.io/v0.5.0.html) for latest release details.
+See [rsadsb-v0.5.0](https://rsadsb.github.io/v0.5.0.html) for latest major release details.
 
 ## Tested Support
 
 Through the use of the [rust-soapysdr](https://github.com/kevinmehall/rust-soapysdr) project,
 we support [many different](https://github.com/pothosware/SoapySDR/wiki) software defined radio devices.
 If you have tested this project on devices not listed below, let me know!
-(you will need to add gain settings to `src/bin/dump1090.rs`)
+(you will need to add gain settings to [config.toml](dump1090_rs/config.toml) or use `--custom-config`)
 
 | Device | Supported/Tested | Recommend | argument          |
 | ------ | :--------------: | :-------: | ----------------- |
@@ -59,14 +59,15 @@ wcampbell0x2a
 ADS-B Demodulator and Server
 
 USAGE:
-    dump1090 [OPTIONS]
+    dump1090_rs [OPTIONS]
 
 OPTIONS:
-        --driver <DRIVER>    soapysdr driver (sdr device)
-    -h, --help               Print help information
-        --host <HOST>        ip address [default: 127.0.0.1]
-        --port <PORT>        port [default: 30002]
-    -V, --version            Print version information
+        --custom-config <CUSTOM_CONFIG>    filepath for config.toml file overriding or adding sdr gain values
+        --driver <DRIVER>                  soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
+    -h, --help                             Print help information
+        --host <HOST>                      ip address [default: 127.0.0.1]
+        --port <PORT>                      port [default: 30002]
+    -V, --version                          Print version information
 ```
 
 ## Performance tricks
