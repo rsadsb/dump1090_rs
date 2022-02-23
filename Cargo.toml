@@ -25,6 +25,7 @@ harness = false
 [profile.release]
 lto = true
 strip = true
+overflow-checks = true
 
 [workspace]
 members = ["dump1090_rs"]
