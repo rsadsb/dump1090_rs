@@ -701,8 +701,7 @@ checksum = "7fdf1b9db47230893d76faad238fd6097fd6d6a9245cd7a4d90dbd639536bbd2"
 [[package]]
 name = "soapysdr"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "918b0c564f1325489e910b5f2032611f84ec9e7e6324a1d7c991bd3d0e382709"
+source = "git+https://github.com/wcampbell0x2a/rust-soapysdr?branch=add-write-read-settings#64eb939ca0d3c675448da2376dfc990bfc438d84"
 dependencies = [
  "log",
  "num-complex",
@@ -712,8 +711,7 @@ dependencies = [
 [[package]]
 name = "soapysdr-sys"
 version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "587c3e3590bd564ea0ee61a7b4043a3e1111155f03da6b7074b93ba8bce6f8b0"
+source = "git+https://github.com/wcampbell0x2a/rust-soapysdr?branch=add-write-read-settings#64eb939ca0d3c675448da2376dfc990bfc438d84"
 dependencies = [
  "bindgen",
  "cc",

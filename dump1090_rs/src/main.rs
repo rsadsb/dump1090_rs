@@ -18,14 +18,42 @@ struct SdrConfig {
 #[derive(Debug, Deserialize, Serialize)]
 struct Sdr {
     pub driver: String,
+    pub setting: Option<Vec<Arg>>,
     pub gain: Vec<Gain>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+struct Arg {
+    pub key: String,
+    pub value: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 struct Gain {
-    pub name: String,
+    pub key: String,
     pub value: f64,
 }
+
+const CUSTOM_CONFIG_HELP: &str = r#"
+filepath for config.toml file overriding or adding sdr config values for soapysdr
+"#;
+
+const CUSTOM_CONFIG_LONG_HELP: &str = r#"
+filepath for config.toml file overriding or adding sdr config values for soapysdr
+
+An example of overriding the included config of `config.toml` for the rtlsdr:
+
+[[sdr]]
+driver = "rtlsdr"
+
+[[sdrs.setting]]
+key = "biastee"
+value = "true"
+
+[[sdr.gain]]
+key = "GAIN"
+value = 20.0
+"#;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -47,21 +75,11 @@ struct Options {
     #[clap(long, default_value = "rtlsdr")]
     driver: String,
 
-    /// filepath for config.toml file overriding or adding sdr gain values
-    ///
-    /// An example:
-    /// ```
-    /// [[sdr]]
-    /// driver = "custom"
-    /// [[sdr.gain]]
-    /// name = "GAIN"
-    /// value = 0.0
-    /// ```
-    #[clap(long)]
+    #[clap(long, help = CUSTOM_CONFIG_HELP, long_help = CUSTOM_CONFIG_LONG_HELP)]
     custom_config: Option<String>,
 }
 
-fn main() -> Result<(), &'static str> {
+fn main() {
     // read in default compiled config
     let mut config: SdrConfig = toml::from_str(include_str!("../config.toml")).unwrap();
 
@@ -106,12 +124,25 @@ fn main() -> Result<(), &'static str> {
     // check if --driver exists in config
     if let Some(sdr) = config.sdrs.iter().find(|a| a.driver == options.driver) {
         for gain in &sdr.gain {
-            println!("[-] Setting gain: {} = {}", gain.name, gain.value);
-            d.set_gain_element(soapysdr::Direction::Rx, channel, &*gain.name, gain.value)
+            println!("[-] Writing gain: {} = {}", gain.key, gain.value);
+            d.set_gain_element(soapysdr::Direction::Rx, channel, &*gain.key, gain.value)
                 .unwrap();
         }
+        if let Some(setting) = &sdr.setting {
+            for setting in setting {
+                println!("[-] Writing setting: {} = {}", setting.key, setting.value);
+                d.write_setting(&*setting.key, &*setting.value).unwrap();
+                println!(
+                    "[-] Reading setting: {} = {}",
+                    setting.key,
+                    d.read_setting(&*setting.key).unwrap()
+                );
+            }
+        }
     } else {
-        println!("[-] --driver gain values not found in config, not setting gain values");
+        println!(
+            "[-] --driver gain values not found in config, not writing gain or setting values"
+        );
     }
 
     let mut stream = d.rx_stream::<Complex<i16>>(&[channel]).unwrap();

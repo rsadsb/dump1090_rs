@@ -1,19 +1,25 @@
-# Default gain values
+# Default sdr configs. These are included in the binary.
 
+# rtlsdr
 [[sdrs]]
 driver = "rtlsdr"
 
 [[sdrs.gain]]
-name = "TUNER"
+key = "TUNER"
 value = 49.6
 
+[[sdrs.setting]]
+key = "biastee"
+value = "true"
+
+# HackRF
 [[sdrs]]
 driver = "hackrf"
 
 [[sdrs.gain]]
-name = "LNA"
+key = "LNA"
 value = 40.0
 
 [[sdrs.gain]]
-name = "VGA"
+key = "VGA"
 value = 52.0
