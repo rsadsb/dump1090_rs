@@ -8,10 +8,6 @@ driver = "rtlsdr"
 key = "TUNER"
 value = 49.6
 
-[[sdrs.setting]]
-key = "biastee"
-value = "true"
-
 # HackRF
 [[sdrs]]
 driver = "hackrf"
