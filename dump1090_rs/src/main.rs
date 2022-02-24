@@ -1,3 +1,5 @@
+mod sdrconfig;
+
 // std
 use std::io::prelude::*;
 use std::net::{Ipv4Addr, TcpListener};
@@ -5,27 +7,31 @@ use std::net::{Ipv4Addr, TcpListener};
 // third-party
 use clap::Parser;
 use num_complex::Complex;
-use serde::{Deserialize, Serialize};
 
 // crate
 use libdump1090_rs::utils;
+use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
 
-#[derive(Debug, Deserialize, Serialize)]
-struct SdrConfig {
-    pub sdrs: Vec<Sdr>,
-}
+const CUSTOM_CONFIG_HELP: &str = r#"
+filepath for config.toml file overriding or adding sdr config values for soapysdr
+"#;
 
-#[derive(Debug, Deserialize, Serialize)]
-struct Sdr {
-    pub driver: String,
-    pub gain: Vec<Gain>,
-}
+const CUSTOM_CONFIG_LONG_HELP: &str = r#"
+filepath for config.toml file overriding or adding sdr config values for soapysdr
 
-#[derive(Debug, Deserialize, Serialize)]
-struct Gain {
-    pub name: String,
-    pub value: f64,
-}
+An example of overriding the included config of `config.toml` for the rtlsdr:
+
+[[sdr]]
+driver = "rtlsdr"
+
+[[sdrs.setting]]
+key = "biastee"
+value = "true"
+
+[[sdr.gain]]
+key = "GAIN"
+value = 20.0
+"#;
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -47,23 +53,13 @@ struct Options {
     #[clap(long, default_value = "rtlsdr")]
     driver: String,
 
-    /// filepath for config.toml file overriding or adding sdr gain values
-    ///
-    /// An example:
-    /// ```
-    /// [[sdr]]
-    /// driver = "custom"
-    /// [[sdr.gain]]
-    /// name = "GAIN"
-    /// value = 0.0
-    /// ```
-    #[clap(long)]
+    #[clap(long, help = CUSTOM_CONFIG_HELP, long_help = CUSTOM_CONFIG_LONG_HELP)]
     custom_config: Option<String>,
 }
 
-fn main() -> Result<(), &'static str> {
+fn main() {
     // read in default compiled config
-    let mut config: SdrConfig = toml::from_str(include_str!("../config.toml")).unwrap();
+    let mut config: SdrConfig = toml::from_str(DEFAULT_CONFIG).unwrap();
 
     // parse opts
     let options = Options::parse();
@@ -106,12 +102,25 @@ fn main() -> Result<(), &'static str> {
     // check if --driver exists in config
     if let Some(sdr) = config.sdrs.iter().find(|a| a.driver == options.driver) {
         for gain in &sdr.gain {
-            println!("[-] Setting gain: {} = {}", gain.name, gain.value);
-            d.set_gain_element(soapysdr::Direction::Rx, channel, &*gain.name, gain.value)
+            println!("[-] Writing gain: {} = {}", gain.key, gain.value);
+            d.set_gain_element(soapysdr::Direction::Rx, channel, &*gain.key, gain.value)
                 .unwrap();
         }
+        if let Some(setting) = &sdr.setting {
+            for setting in setting {
+                println!("[-] Writing setting: {} = {}", setting.key, setting.value);
+                d.write_setting(&*setting.key, &*setting.value).unwrap();
+                println!(
+                    "[-] Reading setting: {} = {}",
+                    setting.key,
+                    d.read_setting(&*setting.key).unwrap()
+                );
+            }
+        }
     } else {
-        println!("[-] --driver gain values not found in config, not setting gain values");
+        println!(
+            "[-] --driver gain values not found in config, not writing gain or setting values"
+        );
     }
 
     let mut stream = d.rx_stream::<Complex<i16>>(&[channel]).unwrap();

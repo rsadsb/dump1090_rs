@@ -7,15 +7,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-byteorder = "1.4"
-lazy_static = "1.4"
-libc = "0.2"
+byteorder = "1.4.0"
+lazy_static = "1.4.0"
+libc = "0.2.0"
 num-complex = "0.4"
 hexlit = "0.5.0"
 
 [dev-dependencies]
-assert_hex = "0.2"
-criterion = "0.3"
+assert_hex = "0.2.0"
+criterion = "0.3.0"
 
 [[bench]]
 name = "demod_benchmark"
