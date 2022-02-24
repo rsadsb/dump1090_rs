@@ -23,3 +23,5 @@ RUN \
     ldconfig
 
 RUN apt-get install -y libclang-dev
+
+ENV LD_LIBRARY_PATH=/usr/local/lib
