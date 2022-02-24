@@ -3,6 +3,7 @@ name = "libdump1090_rs"
 version = "0.5.1"
 authors = ["Wayne Campbell <wcampbell1995@gmail","John Stanford <johnwstanford@gmail.com>"]
 edition = "2021"
+rust-version = "1.59.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,6 +24,8 @@ harness = false
 
 [profile.release]
 lto = true
+strip = true
+overflow-checks = true
 
 [workspace]
 members = ["dump1090_rs"]
