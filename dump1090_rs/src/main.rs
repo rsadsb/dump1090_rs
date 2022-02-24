@@ -1,3 +1,5 @@
+mod sdrconfig;
+
 // std
 use std::io::prelude::*;
 use std::net::{Ipv4Addr, TcpListener};
@@ -5,34 +7,10 @@ use std::net::{Ipv4Addr, TcpListener};
 // third-party
 use clap::Parser;
 use num_complex::Complex;
-use serde::{Deserialize, Serialize};
 
 // crate
 use libdump1090_rs::utils;
-
-#[derive(Debug, Deserialize, Serialize)]
-struct SdrConfig {
-    pub sdrs: Vec<Sdr>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct Sdr {
-    pub driver: String,
-    pub setting: Option<Vec<Arg>>,
-    pub gain: Vec<Gain>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct Arg {
-    pub key: String,
-    pub value: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct Gain {
-    pub key: String,
-    pub value: f64,
-}
+use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
 
 const CUSTOM_CONFIG_HELP: &str = r#"
 filepath for config.toml file overriding or adding sdr config values for soapysdr
@@ -81,7 +59,7 @@ struct Options {
 
 fn main() {
     // read in default compiled config
-    let mut config: SdrConfig = toml::from_str(include_str!("../config.toml")).unwrap();
+    let mut config: SdrConfig = toml::from_str(DEFAULT_CONFIG).unwrap();
 
     // parse opts
     let options = Options::parse();
