@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Thanks [@Cherenkov11](https://github.com/Cherenkov11) for the feature suggestion.
 - Add `--custom-config` for providing custom configs for SDRs. See `--help` for examples.
 
+### Breaking
+- Stripped release binaries, requires bump of MSRV to `1.59`. This reduces the size of the generated binary from ~800KB to ~400KB.
+- Added `overflow-checks`, tested without errors.
+
 ## [v0.5.1] 2022-02-13
 
 ## [v0.5.0] 2022-02-12
