@@ -27,11 +27,11 @@ If you have tested this project on devices not listed below, let me know!
 
 ## Build
 
-Install `soapysdr` drivers.
+Install `soapysdr` drivers and library and `libclang-dev`.
 
 ### Ubuntu
 ```
-> apt install libsoapysdr-dev
+> apt install libsoapysdr-dev libclang-dev
 ```
 
 ### Cross Compile
