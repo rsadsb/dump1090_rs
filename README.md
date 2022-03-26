@@ -29,6 +29,9 @@ If you have tested this project on devices not listed below, let me know!
 
 Install `soapysdr` drivers and library and `libclang-dev`.
 
+### Note
+Using `debug` builds will result in SDR overflows, always using `--release` for production.
+
 ### Ubuntu
 ```
 > apt install libsoapysdr-dev libclang-dev
@@ -39,8 +42,8 @@ Use [hub.docker.com/r/rsadsb](https://hub.docker.com/r/rsadsb/ci/tags) for cross
 These images already have `soapysdr` installed.
 ```
 > cargo install cross
-> cross build --workspace --target x86_64-unknown-linux-gnu
-> cross build --workspace --target armv7-unknown-linux-gnueabihf
+> cross build --workspace --target x86_64-unknown-linux-gnu --relese
+> cross build --workspace --target armv7-unknown-linux-gnueabihf --release
 ```
 
 ### Release Builds
