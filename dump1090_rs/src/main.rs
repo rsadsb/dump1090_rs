@@ -57,6 +57,7 @@ struct Options {
     custom_config: Option<String>,
 }
 
+// main will exit as 0 for success, 1 on error
 fn main() {
     // read in default compiled config
     let mut config: SdrConfig = toml::from_str(DEFAULT_CONFIG).unwrap();
@@ -137,42 +138,58 @@ fn main() {
     let mut sockets = vec![];
 
     loop {
+        // add more clients
         if let Ok((s, _addr)) = listener.accept() {
             sockets.push(s);
         }
 
-        if let Ok(len) = stream.read(&[&mut buf], 5_000_000) {
-            //utils::save_test_data(&buf[..len]);
-            let buf = &buf[..len];
-            let outbuf = utils::to_mag(buf);
-            let resulting_data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
-            if !resulting_data.is_empty() {
-                let resulting_data: Vec<String> = resulting_data
-                    .iter()
-                    .map(|a| {
-                        let a = hex::encode(a);
-                        let a = format!("*{};\n", a);
-                        println!("{}", &a[..a.len() - 1]);
-                        a
-                    })
-                    .collect();
+        // try and read from sdr device
+        match stream.read(&[&mut buf], 5_000_000) {
+            Ok(len) => {
+                //utils::save_test_data(&buf[..len]);
+                // demodulate new data
+                let buf = &buf[..len];
+                let outbuf = utils::to_mag(buf);
+                let resulting_data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
 
-                let mut remove_indexs = vec![];
-                for (i, mut socket) in &mut sockets.iter().enumerate() {
-                    for msg in &resulting_data {
-                        // write, or add to remove list if ConnectionReset
-                        if let Err(e) = socket.write_all(msg.as_bytes()) {
-                            if e.kind() == std::io::ErrorKind::ConnectionReset {
-                                remove_indexs.push(i);
-                                break;
+                // send new data to connected clients
+                if !resulting_data.is_empty() {
+                    let resulting_data: Vec<String> = resulting_data
+                        .iter()
+                        .map(|a| {
+                            let a = hex::encode(a);
+                            let a = format!("*{};\n", a);
+                            println!("{}", &a[..a.len() - 1]);
+                            a
+                        })
+                        .collect();
+
+                    let mut remove_indexs = vec![];
+                    for (i, mut socket) in &mut sockets.iter().enumerate() {
+                        for msg in &resulting_data {
+                            // write, or add to remove list if ConnectionReset
+                            if let Err(e) = socket.write_all(msg.as_bytes()) {
+                                if e.kind() == std::io::ErrorKind::ConnectionReset {
+                                    remove_indexs.push(i);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
 
-                // remove
-                for i in remove_indexs {
-                    sockets.remove(i);
+                    // remove
+                    for i in remove_indexs {
+                        sockets.remove(i);
+                    }
+                }
+            }
+            Err(e) => {
+                // exit on sdr timeout
+                let code = e.code;
+                if matches!(code, soapysdr::ErrorCode::Timeout) {
+                    println!("[!] exiting: could not read SDR device");
+                    // exit with error code as 1 so that systemctl can restart
+                    std::process::exit(1);
                 }
             }
         }
