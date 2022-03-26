@@ -52,7 +52,7 @@ pub fn to_mag(data: &[Complex<i16>]) -> MagnitudeBuffer {
 
         let mag_sqr = fi * fi + fq * fq;
         let mag = f32::sqrt(mag_sqr);
-        outbuf.push((mag * f32::from(u16::MAX) + 0.5) as u16);
+        outbuf.push(mag.mul_add(f32::from(u16::MAX), 0.5) as u16);
     }
     outbuf
 }
