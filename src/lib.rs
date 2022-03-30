@@ -8,8 +8,6 @@ timing, and things like that might give results that are not quite identical.
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use lazy_static::lazy_static;
-
 // public
 pub mod demod_2400;
 
@@ -26,33 +24,6 @@ pub const MODES_MAG_BUF_SAMPLES: usize = 131_072;
 const TRAILING_SAMPLES: usize = 326;
 const MODES_LONG_MSG_BYTES: usize = 14;
 const MODES_SHORT_MSG_BYTES: usize = 7;
-
-lazy_static! {
-    pub static ref MAG_LUT: [u16; 256 * 256] = {
-        let mut ans: [u16; 256 * 256] = [0u16; 256 * 256];
-
-        let mut index = 0;
-        for i in 0..256 {
-            for q in 0..256 {
-                let fi = (i as f32 - 127.5) / 127.5;
-                let fq = (q as f32 - 127.5) / 127.5;
-                let magsq: f32 = match fi.mul_add(fi, fq * fq) {
-                    x if x > 1.0 => 1.0,
-                    x => x,
-                };
-                let mag_f32 = magsq.sqrt();
-                let mag_f32_scaled = mag_f32 * 65535.0;
-                let mag_f32_rounded = mag_f32_scaled.round();
-
-                let mag: u16 = mag_f32_rounded as u16;
-
-                ans[index] = mag;
-                index += 1;
-            }
-        }
-        ans
-    };
-}
 
 // dump1090.h:252
 #[derive(Copy, Clone, Debug)]

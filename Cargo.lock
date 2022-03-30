@@ -390,7 +390,6 @@ dependencies = [
  "criterion",
  "hexlit",
  "lazy_static",
- "libc",
  "num-complex",
 ]
 

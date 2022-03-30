@@ -31,7 +31,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ensure_inlcude_str() {
+    fn ensure_include_str() {
         // ensure that the include_str config compiles to an SdrConfig
         let _: SdrConfig = toml::from_str(DEFAULT_CONFIG).unwrap();
     }
