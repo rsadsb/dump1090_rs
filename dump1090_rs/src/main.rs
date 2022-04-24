@@ -79,8 +79,9 @@ fn main() {
     }
 
     // setup soapysdr driver
-    println!("[-] using driver: {}", options.driver);
-    let d = soapysdr::Device::new(&*format!("driver={}", options.driver)).unwrap();
+    let driver = format!("driver={}", options.driver);
+    println!("[-] using soapysdr driver: {driver}");
+    let d = soapysdr::Device::new(&*driver).unwrap();
     let channel = 0;
 
     d.set_frequency(soapysdr::Direction::Rx, channel, 1_090_000_000.0, ())
@@ -121,9 +122,7 @@ fn main() {
             }
         }
     } else {
-        println!(
-            "[-] --driver gain values not found in config, not writing gain or setting values"
-        );
+        println!("[!] {driver} not found in config, not setting sdr config settings");
     }
 
     let mut stream = d.rx_stream::<Complex<i16>>(&[channel]).unwrap();
