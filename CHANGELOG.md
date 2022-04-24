@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [#16](https://github.com/rsadsb/dump1090_rs/issues/16) [!17](https://github.com/rsadsb/dump1090_rs/pull/17).
   Thanks [@Cherenkov11](https://github.com/Cherenkov11) for the feature suggestion.
 - Add `--custom-config` for providing custom configs for SDRs. See `--help` for examples.
+- Improve performance by 2% by using compiler aided `mul_add` [!21](https://github.com/rsadsb/dump1090_rs/pull/21/files).
 
 ### Breaking
 - Stripped release binaries, requires bump of MSRV to `1.59`. This reduces the size of the generated binary from ~800KB to ~400KB.
