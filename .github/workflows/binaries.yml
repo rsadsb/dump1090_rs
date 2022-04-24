@@ -37,7 +37,7 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --workspace --release --target ${{ matrix.targets }}
+          args: --workspace --locked --release --target ${{ matrix.targets }}
 
       - name: archive
         run: |
