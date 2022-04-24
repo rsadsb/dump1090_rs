@@ -82,6 +82,9 @@ To enable maximum performance, instruct rustc to use features specific to your c
 > RUSTFLAGS="-C target-cpu=native" cargo r --release
 ```
 
+Always use the latest rust releases including nightly, currently this gives around a 5-10% performance
+boost.
+
 ## Testing
 ```
 > cargo t --workspace --release
