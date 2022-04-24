@@ -56,6 +56,8 @@ Run the software using the default rtlsdr.
 ```
 
 ### help
+
+See `--help` for detailed information.
 ```
 dump1090_rs 0.5.1
 wcampbell0x2a
@@ -65,11 +67,11 @@ USAGE:
     dump1090_rs [OPTIONS]
 
 OPTIONS:
-        --custom-config <CUSTOM_CONFIG>    filepath for config.toml file overriding or adding sdr gain values
-        --driver <DRIVER>                  soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
+        --custom-config <CUSTOM_CONFIG>    Filepath for config.toml file overriding or adding sdr config values for soapysdr
+        --driver <DRIVER>                  Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
     -h, --help                             Print help information
-        --host <HOST>                      ip address [default: 127.0.0.1]
-        --port <PORT>                      port [default: 30002]
+        --host <HOST>                      Ip Address to bind with for client connections [default: 127.0.0.1]
+        --port <PORT>                      Port to bind with for client connections [default: 30002]
     -V, --version                          Print version information
 ```
 

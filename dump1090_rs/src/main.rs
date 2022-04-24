@@ -12,12 +12,10 @@ use num_complex::Complex;
 use libdump1090_rs::utils;
 use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
 
-const CUSTOM_CONFIG_HELP: &str = r#"
-filepath for config.toml file overriding or adding sdr config values for soapysdr
+const CUSTOM_CONFIG_HELP: &str = r#"Filepath for config.toml file overriding or adding sdr config values for soapysdr
 "#;
 
-const CUSTOM_CONFIG_LONG_HELP: &str = r#"
-filepath for config.toml file overriding or adding sdr config values for soapysdr
+const CUSTOM_CONFIG_LONG_HELP: &str = r#"Filepath for config.toml file overriding or adding sdr config values for soapysdr
 
 An example of overriding the included config of `config.toml` for the rtlsdr:
 
@@ -41,15 +39,19 @@ value = 20.0
     about = "ADS-B Demodulator and Server"
 )]
 struct Options {
-    /// ip address
+    /// Ip Address to bind with for client connections
     #[clap(long, default_value = "127.0.0.1")]
     host: Ipv4Addr,
 
-    /// port
+    /// Port to bind with for client connections
     #[clap(long, default_value = "30002")]
     port: u16,
 
-    /// soapysdr driver name (sdr device) from default `config.toml` or `--custom-config`
+    /// Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config`
+    ///
+    /// This is used both for instructing soapysdr how to find the sdr and what sdr is being used,
+    /// as well as the key value in the `config.toml` file. This must match exactly with the
+    /// `.driver` field in order for this application to use the provided config settings.
     #[clap(long, default_value = "rtlsdr")]
     driver: String,
 
