@@ -67,7 +67,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
             } else {
                 -1
             }
-        }
+        },
         11 => {
             // 11: All-call reply
             let iid = crc & 0x7f;
@@ -81,7 +81,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
                 (0, _, false) => -1,
                 (_, _, _) => -2,
             }
-        }
+        },
         17 | 18 => {
             // 17: Extended squitter
             // 18: Extended squitter/non-transponder
@@ -92,7 +92,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
                 (0, false) => 1400,
                 (_, _) => -2,
             }
-        }
+        },
         20 | 21 => {
             // 20: Comm-B, altitude reply
             // 21: Comm-B, identity reply
@@ -100,7 +100,7 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
                 true => 1000,
                 false => -2,
             }
-        }
+        },
         _ => -2,
     }
 }

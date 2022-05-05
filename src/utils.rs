@@ -1,9 +1,9 @@
 // crate
-use crate::MagnitudeBuffer;
-
 // third-party
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use num_complex::Complex;
+
+use crate::MagnitudeBuffer;
 
 pub fn save_test_data(data: &[Complex<i16>]) {
     let now = std::time::SystemTime::now()
