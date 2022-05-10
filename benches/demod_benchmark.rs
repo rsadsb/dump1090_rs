@@ -2,10 +2,9 @@
 use assert_hex::assert_eq_hex;
 use criterion::{criterion_group, criterion_main, Criterion};
 use hexlit::hex;
-use num_complex::Complex;
-
 // crate
 use libdump1090_rs::utils;
+use num_complex::Complex;
 
 fn routine(data: [Complex<i16>; 0x20000], expected_data: &Vec<[u8; 14]>) {
     let outbuf = utils::to_mag(&data);

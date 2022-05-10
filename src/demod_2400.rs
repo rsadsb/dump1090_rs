@@ -1,7 +1,6 @@
 // This module includes functionality translated from demod_2400.c
 
-use crate::mode_s;
-use crate::{MagnitudeBuffer, MODES_LONG_MSG_BYTES};
+use crate::{mode_s, MagnitudeBuffer, MODES_LONG_MSG_BYTES};
 
 #[derive(Clone, Copy, Debug)]
 enum Phase {

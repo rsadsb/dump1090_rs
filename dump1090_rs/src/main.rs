@@ -6,10 +6,9 @@ use std::net::{Ipv4Addr, TcpListener};
 
 // third-party
 use clap::Parser;
-use num_complex::Complex;
-
 // crate
 use libdump1090_rs::utils;
+use num_complex::Complex;
 use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
 
 const CUSTOM_CONFIG_HELP: &str = r#"Filepath for config.toml file overriding or adding sdr config values for soapysdr
@@ -183,7 +182,7 @@ fn main() {
                         sockets.remove(i);
                     }
                 }
-            }
+            },
             Err(e) => {
                 // exit on sdr timeout
                 let code = e.code;
@@ -192,7 +191,7 @@ fn main() {
                     // exit with error code as 1 so that systemctl can restart
                     std::process::exit(1);
                 }
-            }
+            },
         }
     }
 }

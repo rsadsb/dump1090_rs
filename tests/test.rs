@@ -1,7 +1,6 @@
 // third-part
 use assert_hex::assert_eq_hex;
 use hexlit::hex;
-
 // crate
 use libdump1090_rs::utils;
 
