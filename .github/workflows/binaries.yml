@@ -18,16 +18,7 @@ jobs:
           - armv7-unknown-linux-gnueabihf
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -44,7 +35,7 @@ jobs:
           tar -czvf dump1090_rs-${{ matrix.targets }}.tar.gz \
               -C target/${{ matrix.targets }}/release/ dump1090_rs
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: dump1090_rs-${{ matrix.targets }}.tar.gz
           path: dump1090_rs-${{ matrix.targets }}.tar.gz
