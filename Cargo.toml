@@ -1,6 +1,6 @@
 [package]
 name = "libdump1090_rs"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Wayne Campbell <wcampbell1995@gmail","John Stanford <johnwstanford@gmail.com>"]
 edition = "2021"
 rust-version = "1.59.0"
