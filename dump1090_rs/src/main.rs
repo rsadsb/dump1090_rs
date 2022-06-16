@@ -1,19 +1,18 @@
 mod sdrconfig;
 
-// std
-use std::io::prelude::*;
+use std::io::Write;
 use std::net::{Ipv4Addr, TcpListener};
 
-// third-party
 use clap::Parser;
-// crate
 use libdump1090_rs::utils;
 use num_complex::Complex;
 use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
+use soapysdr::Direction;
 
-const CUSTOM_CONFIG_HELP: &str = r#"Filepath for config.toml file overriding or adding sdr config values for soapysdr
-"#;
+const DIRECTION: Direction = Direction::Rx;
 
+const CUSTOM_CONFIG_HELP: &str =
+    "Filepath for config.toml file overriding or adding sdr config values for soapysdr";
 const CUSTOM_CONFIG_LONG_HELP: &str = r#"Filepath for config.toml file overriding or adding sdr config values for soapysdr
 
 An example of overriding the included config of `config.toml` for the rtlsdr:
@@ -81,32 +80,16 @@ fn main() {
     let driver = format!("driver={}", options.driver);
     println!("[-] using soapysdr driver: {driver}");
     let d = soapysdr::Device::new(&*driver).unwrap();
-    let channel = 0;
 
-    d.set_frequency(soapysdr::Direction::Rx, channel, 1_090_000_000.0, ())
-        .unwrap();
-    println!(
-        "[-] frequency: {:?}",
-        d.frequency(soapysdr::Direction::Rx, channel)
-    );
+    // check if --driver exists in config, with selected driver
+    let channel = if let Some(sdr) = config.sdrs.iter().find(|a| a.driver == options.driver) {
+        println!("[-] using config: {sdr:#?}");
+        // set user defined config settings
+        let channel = sdr.channel;
 
-    d.set_sample_rate(soapysdr::Direction::Rx, channel, 2_400_000.0)
-        .unwrap();
-    println!(
-        "[-] sample rate: {:?}",
-        d.sample_rate(soapysdr::Direction::Rx, 0)
-    );
-
-    println!(
-        "[-] available gains: {:?}",
-        d.list_gains(soapysdr::Direction::Rx, 0).unwrap()
-    );
-
-    // check if --driver exists in config
-    if let Some(sdr) = config.sdrs.iter().find(|a| a.driver == options.driver) {
         for gain in &sdr.gain {
             println!("[-] Writing gain: {} = {}", gain.key, gain.value);
-            d.set_gain_element(soapysdr::Direction::Rx, channel, &*gain.key, gain.value)
+            d.set_gain_element(DIRECTION, channel, &*gain.key, gain.value)
                 .unwrap();
         }
         if let Some(setting) = &sdr.setting {
@@ -120,9 +103,24 @@ fn main() {
                 );
             }
         }
+
+        if let Some(antenna) = &sdr.antenna {
+            println!("setting antenna: {}", antenna.name);
+            d.set_antenna(DIRECTION, channel, antenna.name.clone())
+                .unwrap();
+        }
+
+        // now we set defaults
+        d.set_frequency(DIRECTION, channel, 1_090_000_000.0, ())
+            .unwrap();
+        println!("[-] frequency: {:?}", d.frequency(DIRECTION, channel));
+
+        d.set_sample_rate(DIRECTION, channel, 2_400_000.0).unwrap();
+        println!("[-] sample rate: {:?}", d.sample_rate(DIRECTION, 0));
+        channel
     } else {
-        println!("[!] {driver} not found in config, not setting sdr config settings");
-    }
+        panic!("[-] selected --driver gain values not found in custom or default config");
+    };
 
     let mut stream = d.rx_stream::<Complex<i16>>(&[channel]).unwrap();
 

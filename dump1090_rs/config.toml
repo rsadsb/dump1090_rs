@@ -19,3 +19,16 @@ value = 40.0
 [[sdrs.gain]]
 key = "VGA"
 value = 52.0
+
+# USRP B210 (uhd)
+# NOT TESTED(see https://github.com/rsadsb/dump1090_rs/issues/23)
+#[[sdrs]]
+#driver = "udh"
+#channel = 0
+#
+#[[sdrs.gain]]
+#key = "example"
+#value = 0.0
+#
+#[sdrs.antenna]
+#name = "RX"
