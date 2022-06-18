@@ -399,8 +399,8 @@ dependencies = [
  "byteorder",
  "criterion",
  "hexlit",
- "lazy_static",
  "num-complex",
+ "once_cell",
 ]
 
 [[package]]
@@ -474,6 +474,12 @@ dependencies = [
  "hermit-abi",
  "libc",
 ]
+
+[[package]]
+name = "once_cell"
+version = "1.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7709cef83f0c1f58f666e746a08b21e0085f7440fa6a29cc194d68aac97a4225"
 
 [[package]]
 name = "oorandom"
