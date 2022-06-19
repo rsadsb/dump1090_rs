@@ -161,7 +161,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
 
 fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     // This gets rid of the 3 core::panicking::panic_bounds_check calls,
-    // but doesn't loop to improve performance
+    // but doesn't look to improve performance
     assert!(preamble.len() == 14);
 
     // quick check: we must have a rising edge 0->1 and a falling edge 12->13
