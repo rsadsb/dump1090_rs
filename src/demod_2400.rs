@@ -88,7 +88,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             continue 'jloop;
         }
 
-        if let Some((high, base_signal, base_noise)) = check_preamble(&data[j..j+14]) {
+        if let Some((high, base_signal, base_noise)) = check_preamble(&data[j..j + 14]) {
             // Check for enough signal
             if base_signal * 2 < 3 * base_noise {
                 // about 3.5dB SNR
@@ -127,7 +127,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                     // for each phase-bit
                     for i in 0..8 {
                         // find if phase distance denotes a high bit
-                        if phase.calculate_bit(&slice_this_byte[index..index+4]) > 0 {
+                        if phase.calculate_bit(&slice_this_byte[index..index + 4]) > 0 {
                             the_byte |= 1 << (7 - i);
                         }
                         // increment to next phase, increase index
