@@ -93,24 +93,16 @@ boost.
 
 ## Benchmark
 
-Reading from a 512KB iq sample to ADS-B bytes takes ~4.0 ms, but feel free to run benchmarks on your own computer.
+Reading from a 512KB iq sample to ADS-B bytes takes ~3.1 ms, but feel free to run benchmarks on your own computer.
 ```
 > RUSTFLAGS="-C target-cpu=native" cargo bench --workspace
 ```
 
-### Faster hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
+### Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
 ```
-01                      time:   [4.2038 ms 4.2099 ms 4.2169 ms]
-02                      time:   [4.1214 ms 4.1273 ms 4.1335 ms]
-03                      time:   [4.0062 ms 4.0124 ms 4.0191 ms]
-```
-
-
-### Slower hardware: Intel(R) Core(TM) i5-6300U CPU @ 2.40GHz
-```
-01                      time:   [5.7163 ms 5.7744 ms 5.8373 ms]
-02                      time:   [5.5845 ms 5.6405 ms 5.7018 ms]
-03                      time:   [5.4486 ms 5.5052 ms 5.5655 ms]
+01                      time:   [3.1767 ms 3.1790 ms 3.1830 ms]
+02                      time:   [3.1185 ms 3.1195 ms 3.1205 ms]
+03                      time:   [3.0345 ms 3.0352 ms 3.0360 ms]
 ```
 
 # Changes

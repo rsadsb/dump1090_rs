@@ -88,9 +88,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             continue 'jloop;
         }
 
-        let preamble: &[u16] = &data[j..];
-
-        if let Some((high, base_signal, base_noise)) = check_preamble(preamble) {
+        if let Some((high, base_signal, base_noise)) = check_preamble(&data[j..j + 14]) {
             // Check for enough signal
             if base_signal * 2 < 3 * base_noise {
                 // about 3.5dB SNR
@@ -129,7 +127,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                     // for each phase-bit
                     for i in 0..8 {
                         // find if phase distance denotes a high bit
-                        if phase.calculate_bit(&slice_this_byte[index..]) > 0 {
+                        if phase.calculate_bit(&slice_this_byte[index..index + 4]) > 0 {
                             the_byte |= 1 << (7 - i);
                         }
                         // increment to next phase, increase index
@@ -162,11 +160,16 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
 }
 
 fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
+    // This gets rid of the 3 core::panicking::panic_bounds_check calls,
+    // but doesn't look to improve performance
+    assert!(preamble.len() == 14);
+
     // quick check: we must have a rising edge 0->1 and a falling edge 12->13
     if !(preamble[0] < preamble[1] && preamble[12] > preamble[13]) {
         return None;
     }
 
+    // check the rising and falling edges of signal
     if preamble[1] > preamble[2] &&                                       // 1
        preamble[2] < preamble[3] && preamble[3] > preamble[4] &&          // 3
        preamble[8] < preamble[9] && preamble[9] > preamble[10] &&         // 9
