@@ -1,4 +1,4 @@
-FROM rustembedded/cross:armv7-unknown-linux-gnueabihf-0.2.1
+FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.2
 
 RUN \
     git clone https://github.com/pothosware/SoapySDR.git &&\
@@ -22,6 +22,6 @@ RUN \
     make install &&\
     ldconfig
 
-RUN apt-get install -y libclang-dev
+RUN apt-get update -y && apt-get install -y libclang-dev
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
