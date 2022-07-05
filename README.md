@@ -40,14 +40,20 @@ Using `debug` builds will result in SDR overflows, always using `--release` for 
 
 ### Cross Compile
 Use [hub.docker.com/r/rsadsb](https://hub.docker.com/r/rsadsb/ci/tags) for cross compiling to the following archs.
-These images already have `soapysdr` installed.
+These images already have `soapysdr` installed with the correct cross compilers.
+This uses [cross-rs](https://github.com/cross-rs/cross).
 ```
 > cargo install cross
 > cross build --workspace --target x86_64-unknown-linux-gnu --relese
+
+# Used for example in Raspberry Pi (raspios) 32 bit
 > cross build --workspace --target armv7-unknown-linux-gnueabihf --release
+
+# Used for example in Raspberry Pi (raspios) 64 bit
+> cross build --workspace --target aarm64-unknown-linux-gnu --release
 ```
 
-### Release Builds
+### Release Builds from CI
 Check the [latest release](https://github.com/rsadsb/dump1090_rs/releases) for binaries built from the CI.
 
 ## Run
