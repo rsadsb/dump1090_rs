@@ -6,14 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 ### Features
-- Released docker image: `v0.1.1:armv7-unknown-linux-gnueabihf`.
-  Fixes error when running `cargo test` including the shared library `soapysdr`.
+  Fixes error when running `cargo test` including the shared library `soapysdr`
 - Bump `soapysdr-rs` to `v0.3.2`, enabling the use of read/write settings. For example, enabling bias-t on the rtlsdr is now allowed!
   [#16](https://github.com/rsadsb/dump1090_rs/issues/16) [!17](https://github.com/rsadsb/dump1090_rs/pull/17).
-  Thanks [@Cherenkov11](https://github.com/Cherenkov11) for the feature suggestion.
-- Add `--custom-config` for providing custom configs for SDRs. See `--help` for examples.
-- Improve performance by 2% by using compiler aided `mul_add` [!21](https://github.com/rsadsb/dump1090_rs/pull/21/files).
-- Improve performance by 38% by limiting slice size [!41](https://github.com/rsadsb/dump1090_rs/pull/41).
+  Thanks [@Cherenkov11](https://github.com/Cherenkov11) for the feature suggestion
+- Add `--custom-config` for providing custom configs for SDRs. See `--help` for examples
+- Improve performance by 2% by using compiler aided `mul_add` [!21](https://github.com/rsadsb/dump1090_rs/pull/21/files)
+- Improve performance by 38% by limiting slice size [!41](https://github.com/rsadsb/dump1090_rs/pull/41)
+- Add support for `aarm64-unknown-linux-gnu`, for Raspberry Pi 64 bit
+- Updated other docker images to `0.2.0`: [docker hub](https://hub.docker.com/repository/docker/rsadsb/ci/tags?page=1&ordering=last_updated&name=0.2.0)
 
 ### Breaking
 - Stripped release binaries, requires bump of MSRV to `1.59`. This reduces the size of the generated binary from ~800KB to ~400KB.
