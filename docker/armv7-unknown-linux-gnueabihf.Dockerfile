@@ -1,5 +1,7 @@
 FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.4
 
+RUN apt-get update -y && apt-get install -y cmake git llvm-dev libclang-common-8-dev pkg-config clang-8
+
 RUN \
     git clone https://github.com/pothosware/SoapySDR.git &&\
     cd SoapySDR &&\
@@ -21,7 +23,5 @@ RUN \
     make -j4 &&\
     make install &&\
     ldconfig
-
-RUN apt-get update -y && apt-get install -y libclang-dev
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
