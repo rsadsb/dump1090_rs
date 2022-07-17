@@ -25,12 +25,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.targets }}
-          override: true
+          components: rustfmt, clippy
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
@@ -50,11 +49,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: nightly
-          override: true
           components: rustfmt, clippy
 
       - uses: actions-rs/cargo@v1
