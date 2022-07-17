@@ -1,4 +1,7 @@
-FROM rustembedded/cross:x86_64-unknown-linux-gnu
+FROM ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && apt-get install -y cmake git llvm-dev libclang-dev clang pkg-config
 
 RUN \
     git clone https://github.com/pothosware/SoapySDR.git &&\
@@ -10,11 +13,4 @@ RUN \
     make -j4 &&\
     make install
 
-RUN yum update -y && \
-    yum install centos-release-scl -y && \
-    yum install llvm-toolset-7 -y
-
-ENV LIBCLANG_PATH=/opt/rh/llvm-toolset-7/root/usr/lib64/ \
-    LIBCLANG_STATIC_PATH=/opt/rh/llvm-toolset-7/root/usr/lib64/ \
-    CLANG_PATH=/opt/rh/llvm-toolset-7/root/usr/bin/clang
-
+ENV LD_LIBRARY_PATH=/usr/local/lib

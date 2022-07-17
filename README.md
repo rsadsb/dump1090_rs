@@ -40,14 +40,20 @@ Using `debug` builds will result in SDR overflows, always using `--release` for 
 
 ### Cross Compile
 Use [hub.docker.com/r/rsadsb](https://hub.docker.com/r/rsadsb/ci/tags) for cross compiling to the following archs.
-These images already have `soapysdr` installed.
+These images already have `soapysdr` installed with the correct cross compilers.
+This uses [cross-rs](https://github.com/cross-rs/cross).
 ```
 > cargo install cross
 > cross build --workspace --target x86_64-unknown-linux-gnu --relese
+
+# Used for example in Raspberry Pi (raspios) 32 bit
 > cross build --workspace --target armv7-unknown-linux-gnueabihf --release
+
+# Used for example in Raspberry Pi (raspios) 64 bit
+> cross build --workspace --target aarm64-unknown-linux-gnu --release
 ```
 
-### Release Builds
+### Release Builds from CI
 Check the [latest release](https://github.com/rsadsb/dump1090_rs/releases) for binaries built from the CI.
 
 ## Run
@@ -93,16 +99,25 @@ boost.
 
 ## Benchmark
 
-Reading from a 512KB iq sample to ADS-B bytes takes ~3.1 ms, but feel free to run benchmarks on your own computer.
+Reading from a 512KB iq sample to ADS-B bytes takes ~3.0 ms, but feel free to run benchmarks on your own computer.
 ```
 > RUSTFLAGS="-C target-cpu=native" cargo bench --workspace
 ```
 
-### Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz
+### Intel i7-7700K CPU @ 4.20GHz
+
+#### stable (`rustc 1.62.0 (a8314ef7d 2022-06-27)`)
 ```
-01                      time:   [3.1767 ms 3.1790 ms 3.1830 ms]
-02                      time:   [3.1185 ms 3.1195 ms 3.1205 ms]
-03                      time:   [3.0345 ms 3.0352 ms 3.0360 ms]
+01                      time:   [3.0255 ms 3.0315 ms 3.0391 ms]
+02                      time:   [2.9595 ms 2.9647 ms 2.9710 ms]
+03                      time:   [2.8904 ms 2.8931 ms 2.8960 ms]
+```
+
+#### nightly (`rustc 1.64.0-nightly (87588a2af 2022-07-13)`)
+```
+01                      time:   [3.0763 ms 3.0919 ms 3.1202 ms]
+02                      time:   [3.0075 ms 3.0113 ms 3.0157 ms]
+03                      time:   [2.9437 ms 2.9465 ms 2.9495 ms]
 ```
 
 # Changes

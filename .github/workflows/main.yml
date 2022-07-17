@@ -17,6 +17,7 @@ jobs:
         targets:
           - x86_64-unknown-linux-gnu
           - armv7-unknown-linux-gnueabihf
+          - aarch64-unknown-linux-gnu
         toolchain:
           - stable
             # msrv
@@ -24,50 +25,30 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.targets }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --locked --workspace --target ${{ matrix.targets }}
-
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: test
-          args: --locked --workspace --target ${{ matrix.targets }}
+          components: rustfmt, clippy
+      - run: cargo install cross
+      - run: cross build --locked --workspace --target ${{ matrix.targets }}
+      - run: cross test --locked --workspace --target ${{ matrix.targets }}
 
   # fmt and clippy on nightly builds
   fmt-clippy-nightly:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        targets:
-          - x86_64-unknown-linux-gnu
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: nightly
-          target: ${{ matrix.targets }}
-          override: true
+          target: x86_64-unknown-linux-gnu
           components: rustfmt, clippy
+      # fmt
+      - run: cargo fmt --all -- --check
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: clippy
-          args: --workspace -- -D warnings --target ${{ matrix.targets }}
+      # clippy within cross
+      - run: cargo install cross
+      - run: cross clippy --workspace --target x86_64-unknown-linux-gnu -- -D warnings
