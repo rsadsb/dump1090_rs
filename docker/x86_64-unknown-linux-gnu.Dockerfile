@@ -1,4 +1,5 @@
 FROM rust:1.59-slim-buster
+FROM ghcr.io/cross-rs/x86_64-unknown-linux-gnu:0.2.4
 
 RUN apt-get update -y && apt-get install -y cmake git llvm-dev libclang-dev clang pkg-config
 

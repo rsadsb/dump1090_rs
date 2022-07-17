@@ -1,4 +1,4 @@
-FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.2
+FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.4
 
 RUN \
     git clone https://github.com/pothosware/SoapySDR.git &&\

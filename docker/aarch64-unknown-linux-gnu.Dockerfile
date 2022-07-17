@@ -1,4 +1,4 @@
-FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.2
+FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:0.2.4
 
 RUN apt-get update -y && apt-get install -y cmake git llvm-dev libclang-common-8-dev pkg-config clang-8
 
