@@ -21,11 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --workspace --locked --release --target ${{ matrix.targets }}
+      - run: cargo install cross
+      - run: cross build --workspace --locked --release --target ${{ matrix.targets }}
 
       - name: archive
         run: |
