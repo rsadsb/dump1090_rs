@@ -46,10 +46,6 @@ jobs:
   # fmt and clippy on nightly builds
   fmt-clippy-nightly:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        targets:
-          - x86_64-unknown-linux-gnu
 
     steps:
       - uses: actions/checkout@v3
@@ -58,7 +54,6 @@ jobs:
         with:
           profile: minimal
           toolchain: nightly
-          target: ${{ matrix.targets }}
           override: true
           components: rustfmt, clippy
 
@@ -69,6 +64,5 @@ jobs:
 
       - uses: actions-rs/cargo@v1
         with:
-          use-cross: true
           command: clippy
-          args: --workspace -- -D warnings --target ${{ matrix.targets }}
+          args: --workspace -- -D warnings --target
