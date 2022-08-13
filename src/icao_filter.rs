@@ -2,12 +2,10 @@
 
 use std::sync::Mutex;
 
-use once_cell::sync::Lazy;
-
 const ICAO_FILTER_SIZE: u32 = 4096;
 
-static ICAO_FILTER_A: Lazy<Mutex<[u32; 4096]>> = Lazy::new(|| Mutex::new([0; 4096]));
-static ICAO_FILTER_B: Lazy<Mutex<[u32; 4096]>> = Lazy::new(|| Mutex::new([0; 4096]));
+static ICAO_FILTER_A: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
+static ICAO_FILTER_B: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
 
 pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
 {
