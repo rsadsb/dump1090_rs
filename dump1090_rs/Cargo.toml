@@ -2,6 +2,7 @@
 name = "dump1090_rs"
 version = "0.6.0"
 edition = "2021"
+rust-version = "1.63.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
