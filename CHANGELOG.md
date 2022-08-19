@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [v0.6.0] 2022-08-19
 ### Features
-  Fixes error when running `cargo test` including the shared library `soapysdr`
+- Bump MSRV for using new const Mutex, removing `once_cell`.
+- Fix error when running `cargo test` including the shared library `soapysdr`
 - Bump `soapysdr-rs` to `v0.3.2`, enabling the use of read/write settings. For example, enabling bias-t on the rtlsdr is now allowed!
   [#16](https://github.com/rsadsb/dump1090_rs/issues/16) [!17](https://github.com/rsadsb/dump1090_rs/pull/17).
   Thanks [@Cherenkov11](https://github.com/Cherenkov11) for the feature suggestion
