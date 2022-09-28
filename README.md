@@ -66,20 +66,17 @@ Run the software using the default rtlsdr.
 
 See `--help` for detailed information.
 ```
-dump1090_rs 0.5.1
-wcampbell0x2a
 ADS-B Demodulator and Server
 
-USAGE:
-    dump1090_rs [OPTIONS]
+Usage: dump1090_rs [OPTIONS]
 
-OPTIONS:
-        --custom-config <CUSTOM_CONFIG>    Filepath for config.toml file overriding or adding sdr config values for soapysdr
-        --driver <DRIVER>                  Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
-    -h, --help                             Print help information
-        --host <HOST>                      Ip Address to bind with for client connections [default: 127.0.0.1]
-        --port <PORT>                      Port to bind with for client connections [default: 30002]
-    -V, --version                          Print version information
+Options:
+      --host <HOST>                    Ip Address to bind with for client connections [default: 127.0.0.1]
+      --port <PORT>                    Port to bind with for client connections [default: 30002]
+      --driver <DRIVER>                Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
+      --custom-config <CUSTOM_CONFIG>  Filepath for config.toml file overriding or adding sdr config values for soapysdr
+  -h, --help                           Print help information (use `--help` for more detail)
+  -V, --version                        Print version information
 ```
 
 ## Performance tricks
