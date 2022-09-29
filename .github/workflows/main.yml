@@ -30,6 +30,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.targets }}
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
       - run: cargo install cross
       - run: cross build --locked --workspace --target ${{ matrix.targets }}
       - run: cross test --locked --workspace --target ${{ matrix.targets }}
@@ -46,6 +47,7 @@ jobs:
           toolchain: nightly
           target: x86_64-unknown-linux-gnu
           components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
       # fmt
       - run: cargo fmt --all -- --check
 
