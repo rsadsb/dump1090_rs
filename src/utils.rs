@@ -10,7 +10,7 @@ pub fn save_test_data(data: &[Complex<i16>]) {
         .duration_since(std::time::SystemTime::UNIX_EPOCH)
         .unwrap()
         .as_millis();
-    let name = format!("test_{}.iq", now);
+    let name = format!("test_{now}.iq");
     let mut file = std::fs::File::create(name).unwrap();
 
     for d in data {
