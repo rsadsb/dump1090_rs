@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 - Bump MSRV 1.64, for new workspace packages
 
+## [v0.6.1]
+- Update clap to v4
+- Update MSRV to 1.64
+
 ## [v0.6.0] 2022-08-19
 ### Features
 - Bump MSRV for using new const Mutex, removing `once_cell`.

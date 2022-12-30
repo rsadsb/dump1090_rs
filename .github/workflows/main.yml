@@ -32,7 +32,7 @@ jobs:
           target: ${{ matrix.targets }}
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo install cross
+      - run: cargo install cross --git https://github.com/cross-rs/cross || true
       - run: cross build --locked --workspace --target ${{ matrix.targets }}
       - run: cross test --locked --workspace --target ${{ matrix.targets }}
 
@@ -53,5 +53,5 @@ jobs:
       - run: cargo fmt --all -- --check
 
       # clippy within cross
-      - run: cargo install cross
+      - run: cargo install cross --git https://github.com/cross-rs/cross || true
       - run: cross clippy --workspace --target x86_64-unknown-linux-gnu -- -D warnings

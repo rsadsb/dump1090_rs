@@ -156,7 +156,7 @@ fn main() {
                         .iter()
                         .map(|a| {
                             let a = hex::encode(a);
-                            let a = format!("*{};\n", a);
+                            let a = format!("*{a};\n");
                             println!("{}", &a[..a.len() - 1]);
                             a
                         })
