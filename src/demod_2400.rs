@@ -62,6 +62,7 @@ impl Phase {
     }
 
     /// Calculate the PPM bit
+    #[inline(always)]
     fn calculate_bit(self, m: &[u16]) -> i32 {
         let m0 = i32::from(m[0]);
         let m1 = i32::from(m[1]);
