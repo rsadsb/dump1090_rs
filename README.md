@@ -102,19 +102,10 @@ Reading from a 512KB iq sample to ADS-B bytes takes ~3.0 ms, but feel free to ru
 ```
 
 ### Intel i7-7700K CPU @ 4.20GHz
-
-#### stable (`rustc 1.62.0 (a8314ef7d 2022-06-27)`)
 ```
-01                      time:   [3.0255 ms 3.0315 ms 3.0391 ms]
-02                      time:   [2.9595 ms 2.9647 ms 2.9710 ms]
-03                      time:   [2.8904 ms 2.8931 ms 2.8960 ms]
-```
-
-#### nightly (`rustc 1.64.0-nightly (87588a2af 2022-07-13)`)
-```
-01                      time:   [3.0763 ms 3.0919 ms 3.1202 ms]
-02                      time:   [3.0075 ms 3.0113 ms 3.0157 ms]
-03                      time:   [2.9437 ms 2.9465 ms 2.9495 ms]
+01                      time:   [2.9850 ms 2.9859 ms 2.9868 ms]
+02                      time:   [2.9260 ms 2.9279 ms 2.9308 ms]
+03                      time:   [2.8449 ms 2.8525 ms 2.8653 ms]
 ```
 
 # Changes
