@@ -1,4 +1,4 @@
-FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.4
+FROM ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf:0.2.5
 
 RUN apt-get update -y && apt-get install -y cmake git llvm-dev libclang-common-8-dev pkg-config clang-8
 
