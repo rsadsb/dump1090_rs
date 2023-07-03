@@ -21,8 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo install cross --git https://github.com/cross-rs/cross || true
+        with:
+          target: ${{ matrix.targets }}
+      - run: cargo install cargo-quickinstall
+      - run: cargo quickinstall cross@0.2.5 --force
       - run: cross build --workspace --locked --release --target ${{ matrix.targets }}
 
       - name: archive
@@ -41,6 +43,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dump1090_rs-${{ matrix.targets }}.tar.gz
-          asset_name: dump1090_rs-${{ matrix.targets }}.tar.gz
+          asset_name: dump1090_rs-${{ github.ref_name }}-${{ matrix.targets }}.tar.gz
           tag: ${{ github.ref }}
           overwrite: true
