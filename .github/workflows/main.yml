@@ -30,10 +30,8 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.targets }}
-          components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo install cross --git https://github.com/cross-rs/cross || true
-      - run: cross build --locked --workspace --target ${{ matrix.targets }}
+      - run: cargo install cargo-quickinstall
+      - run: cargo quickinstall cross@0.2.5 --force
       - run: cross test --locked --workspace --target ${{ matrix.targets }}
 
   # fmt and clippy on nightly builds
@@ -48,10 +46,10 @@ jobs:
           toolchain: nightly
           target: x86_64-unknown-linux-gnu
           components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v2
       # fmt
       - run: cargo fmt --all -- --check
 
       # clippy within cross
-      - run: cargo install cross --git https://github.com/cross-rs/cross || true
+      - run: cargo install cargo-quickinstall
+      - run: cargo quickinstall cross@0.2.5 --force
       - run: cross clippy --workspace --target x86_64-unknown-linux-gnu -- -D warnings
