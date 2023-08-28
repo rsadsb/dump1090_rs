@@ -1,7 +1,7 @@
 mod sdrconfig;
 
 use std::io::Write;
-use std::net::{Ipv4Addr, TcpListener};
+use std::net::{IpAddr, TcpListener};
 
 use clap::Parser;
 use libdump1090_rs::utils;
@@ -39,7 +39,7 @@ value = 20.0
 struct Options {
     /// Ip Address to bind with for client connections
     #[clap(long, default_value = "127.0.0.1")]
-    host: Ipv4Addr,
+    host: IpAddr,
 
     /// Port to bind with for client connections
     #[clap(long, default_value = "30002")]
