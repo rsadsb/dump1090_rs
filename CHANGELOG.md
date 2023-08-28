@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 - Inline `calculate_bit`, giving 5% performance boost
-- Bump to MSRV 1.65, for new workspace packages and new required libc version LIBC.
+- Bump to MSRV 1.65, for new workspace packages and new required libc version
+- Update `--host` to support IPv6
 
 ## [v0.6.1]
 - Update clap to v4
