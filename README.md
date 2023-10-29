@@ -1,6 +1,6 @@
 # dump1090_rs
-[![Actions Status](https://github.com/rsadsb/dump1090_rs/workflows/CI/badge.svg)](https://github.com/rsadsb/dump1090_rs/actions)
-[![dependency status](https://deps.rs/repo/github/rsadsb/dump1090_rs/status.svg)](https://deps.rs/repo/github/rsadsb/dump1090_rs)
+[<img alt="github" src="https://img.shields.io/badge/github-rsadsb/dump1090_rs-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/rsadsb/dump1090_rs)
+[<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/rsadsb/dump1090_rs/main.yml?branch=master&style=for-the-badge" height="20">](https://github.com/rsadsb/dump1090_rs/actions?query=branch%3Amaster)
 
 Demodulate a ADS-B signal from a software defined radio device tuned at 1090mhz and
 forward the bytes to applications such as [adsb_deku/radar](https://github.com/rsadsb/adsb_deku).
