@@ -89,8 +89,7 @@ fn main() {
 
         for gain in &sdr.gain {
             println!("[-] Writing gain: {} = {}", gain.key, gain.value);
-            d.set_gain_element(DIRECTION, channel, &*gain.key, gain.value)
-                .unwrap();
+            d.set_gain_element(DIRECTION, channel, &*gain.key, gain.value).unwrap();
         }
         if let Some(setting) = &sdr.setting {
             for setting in setting {
@@ -106,13 +105,11 @@ fn main() {
 
         if let Some(antenna) = &sdr.antenna {
             println!("setting antenna: {}", antenna.name);
-            d.set_antenna(DIRECTION, channel, antenna.name.clone())
-                .unwrap();
+            d.set_antenna(DIRECTION, channel, antenna.name.clone()).unwrap();
         }
 
         // now we set defaults
-        d.set_frequency(DIRECTION, channel, 1_090_000_000.0, ())
-            .unwrap();
+        d.set_frequency(DIRECTION, channel, 1_090_000_000.0, ()).unwrap();
         println!("[-] frequency: {:?}", d.frequency(DIRECTION, channel));
 
         d.set_sample_rate(DIRECTION, channel, 2_400_000.0).unwrap();
@@ -129,9 +126,7 @@ fn main() {
 
     // bind to listener port
     let listener = TcpListener::bind((options.host, options.port)).unwrap();
-    listener
-        .set_nonblocking(true)
-        .expect("Cannot set non-blocking");
+    listener.set_nonblocking(true).expect("Cannot set non-blocking");
 
     let mut sockets = vec![];
 
@@ -180,7 +175,7 @@ fn main() {
                         sockets.remove(i);
                     }
                 }
-            },
+            }
             Err(e) => {
                 // exit on sdr timeout
                 let code = e.code;
@@ -189,7 +184,7 @@ fn main() {
                     // exit with error code as 1 so that systemctl can restart
                     std::process::exit(1);
                 }
-            },
+            }
         }
     }
 }

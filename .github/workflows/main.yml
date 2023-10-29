@@ -34,8 +34,8 @@ jobs:
       - run: cargo quickinstall cross@0.2.5 --force
       - run: cross test --locked --workspace --target ${{ matrix.targets }}
 
-  # fmt and clippy on nightly builds
-  fmt-clippy-nightly:
+  # fmt and clippy
+  fmt-clippy:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +43,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly
+          toolchain: stable
           target: x86_64-unknown-linux-gnu
           components: rustfmt, clippy
       # fmt
