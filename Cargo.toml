@@ -17,7 +17,7 @@ num-complex = "0.4.0"
 hexlit = "0.5.0"
 
 [dev-dependencies]
-assert_hex = "0.2.0"
+assert_hex = "0.4.1"
 criterion = "0.5.1"
 
 [[bench]]
