@@ -137,7 +137,7 @@ fn main() {
         }
 
         // try and read from sdr device
-        match stream.read(&[&mut buf], 5_000_000) {
+        match stream.read(&mut [&mut buf], 5_000_000) {
             Ok(len) => {
                 //utils::save_test_data(&buf[..len]);
                 // demodulate new data
