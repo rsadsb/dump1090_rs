@@ -7,7 +7,7 @@ rust-version.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = {version = "4.4.7", features = ["color", "derive", "wrap_help"]}
+clap = {version = "4.4.8", features = ["color", "derive", "wrap_help"]}
 num-complex = "0.4.4"
 soapysdr = "0.4.0"
 libdump1090_rs = { path = "../", version = "0.6.0" }
