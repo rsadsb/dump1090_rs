@@ -20,6 +20,45 @@ value = 40.0
 key = "VGA"
 value = 52.0
 
+# bladeRF 2.0 micro xA4
+[[sdrs]]
+driver = "bladerf"
+channel = 0 # RX1
+
+[[sdrs.gain]]
+# key might be different on other bladeRF models
+key = "full"
+value = 35.0
+
+# Loading an FPGA image causes error due to SoapyBladeRF not subsequently closing and re-opening the device.
+#   Calibration TIMEOUT (0x16, 0x80)
+#   [ERROR @ host/libraries/libbladeRF/src/board/bladerf2/rfic_host.c:397] _rfic_host_set_sample_rate: ad9361_set_rx_sampling_freq(phy, rate) failed: An unexpected error occurred
+#   [ERROR @ host/libraries/libbladeRF/src/board/bladerf2/bladerf2.c:1131] bladerf2_set_sample_rate: rfic->set_sample_rate(dev, ch, rate) failed: An unexpected error occurred
+#   [ERROR @ host/libraries/libbladeRF/src/board/bladerf2/bladerf2.c:1000] bladerf2_set_rational_sample_rate: dev->board->set_sample_rate(dev, ch, integer_rate, &actual_integer_rate) failed: An unexpected error occurred
+# Recommend manually loading or flashing FPGA image as a workaround
+#   a. Load image (must run every time SDR is reconnected)
+#      $ bladeRF-cli -l /usr/share/Nuand/bladeRF/hostedxA4.rbf
+#   b. Flash image (run once)
+#      $ bladeRF-cli -L /usr/share/Nuand/bladeRF/hostedxA4.rbf
+#[[sdrs.setting]]
+#key = "load_fpga"
+#value = "/usr/share/Nuand/bladeRF/hostedxA4.rbf"
+
+# Manage bias tee
+# Requires compiling SoapyBladeRF from source at https://github.com/pothosware/SoapyBladeRF/tree/master since bias_tee support was added after the version in the Ubuntu repos
+#   $ sudo add-apt-repository -y ppa:bladerf/bladerf
+#   $ sudo apt-get install -y bladerf libbladerf-dev
+#   $ git clone https://github.com/pothosware/SoapyBladeRF.git
+#   $ cd SoapyBladeRF
+#   $ mkdir build
+#   $ cd build
+#   $ cmake ..
+#   $ make
+#   $ sudo make install
+#[[sdrs.setting]]
+#key = "biastee_rx"
+#value = "true"
+
 # USRP B210 (uhd)
 # NOT TESTED(see https://github.com/rsadsb/dump1090_rs/issues/23)
 #[[sdrs]]
