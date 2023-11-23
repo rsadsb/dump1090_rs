@@ -16,11 +16,12 @@ we support [many different](https://github.com/pothosware/SoapySDR/wiki) softwar
 If you have tested this project on devices not listed below, let me know!
 (you will need to add gain settings to [config.toml](dump1090_rs/config.toml) or use `--custom-config`)
 
-| Device    | Supported/Tested | Recommend | argument          |
-| --------- | :--------------: | :-------: | ----------------- |
-| rtlsdr    |        x         |     x     | `--driver rtlsdr` |
-| HackRF    |        x         |           | `--driver hackrf` |
-| uhd(USRP) |        x         |           | `--driver uhd` |
+| Device                | Supported/Tested | Recommend | argument          |
+| --------------------- | :--------------: | :-------: | ----------------- |
+| rtlsdr                |        x         |     x     | `--driver rtlsdr` |
+| HackRF                |        x         |           | `--driver hackrf` |
+| uhd(USRP)             |        x         |           | `--driver uhd`    |
+| bladeRF 2.0 micro xA4 | x                |           | `--driver bladerf`|
 
 
 ## Usage
