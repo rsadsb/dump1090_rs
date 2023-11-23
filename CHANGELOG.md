@@ -5,9 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+## [v0.7.0] 2022-11-22
 - Inline `calculate_bit`, giving 5% performance boost
-- Bump to MSRV 1.70, for new workspace packages, required libc version, and clap updates
-- Update `--host` to support IPv6
+- Bump MSRV to 1.70, for new workspace packages, required libc version, and clap updates
+- Update `--host` to support IPv6 [!67](https://github.com/rsadsb/dump1090_rs/pull/67)
+  Thanks [@daviessm](https://github.com/daviessm)
+- Add bladeRF 2.0 micro xA4 support [!21](https://github.com/rsadsb/dump1090_rs/pull/87)
+  Thanks [@tjmullicani](https://github.com/tjmullicani)
 
 ## [v0.6.1]
 - Update clap to v4
