@@ -13,4 +13,4 @@ soapysdr = "0.4.0"
 libdump1090_rs = { path = "../", version = "0.7.0" }
 hex = "0.4.0"
 toml = "0.8.8"
-serde = { version = "1.0.193", features = ["derive"] }
+serde = { version = "1.0.196", features = ["derive"] }
