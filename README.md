@@ -71,12 +71,13 @@ ADS-B Demodulator and Server
 Usage: dump1090_rs [OPTIONS]
 
 Options:
-      --host <HOST>                    Ip Address to bind with for client connections [default: 127.0.0.1]
-      --port <PORT>                    Port to bind with for client connections [default: 30002]
-      --driver <DRIVER>                Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
+      --host <HOST>                    ip address to bind with for client connections [default: 127.0.0.1]
+      --port <PORT>                    port to bind with for client connections [default: 30002]
+      --driver <DRIVER>                soapysdr driver name (sdr device) from default `config.toml` or `--custom-config` [default: rtlsdr]
+      --driver-extra <DRIVER_EXTRA>    specify extra values for soapysdr driver specification
       --custom-config <CUSTOM_CONFIG>  Filepath for config.toml file overriding or adding sdr config values for soapysdr
-  -h, --help                           Print help information (use `--help` for more detail)
-  -V, --version                        Print version information
+  -h, --help                           Print help (see more with '--help')
+  -V, --version                        Print version
 ```
 
 ## Performance tricks
