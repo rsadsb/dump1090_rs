@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-## [v0.7.0] 2022-11-22
+## [v0.7.1] 2024-02-10
+- Add `--driver-extra` to specify additional sopaysdr device options [!108](https://github.com/rsadsb/dump1090_rs/pull/108)
+
+## [v0.7.0] 2023-11-22
 - Inline `calculate_bit`, giving 5% performance boost
 - Bump MSRV to 1.70, for new workspace packages, required libc version, and clap updates
 - Update `--host` to support IPv6 [!67](https://github.com/rsadsb/dump1090_rs/pull/67)

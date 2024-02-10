@@ -299,7 +299,7 @@ dependencies = [
 
 [[package]]
 name = "dump1090_rs"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "clap",
  "hex",
@@ -450,7 +450,7 @@ checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 
 [[package]]
 name = "libdump1090_rs"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "assert_hex",
  "byteorder",
