@@ -37,21 +37,25 @@ value = 20.0
     about = "ADS-B Demodulator and Server"
 )]
 struct Options {
-    /// Ip Address to bind with for client connections
+    /// ip address to bind with for client connections
     #[clap(long, default_value = "127.0.0.1")]
     host: IpAddr,
 
-    /// Port to bind with for client connections
+    /// port to bind with for client connections
     #[clap(long, default_value = "30002")]
     port: u16,
 
-    /// Soapysdr driver name (sdr device) from default `config.toml` or `--custom-config`
+    /// soapysdr driver name (sdr device) from default `config.toml` or `--custom-config`
     ///
     /// This is used both for instructing soapysdr how to find the sdr and what sdr is being used,
     /// as well as the key value in the `config.toml` file. This must match exactly with the
     /// `.driver` field in order for this application to use the provided config settings.
     #[clap(long, default_value = "rtlsdr")]
     driver: String,
+
+    /// specify extra values for soapysdr driver specification
+    #[clap(long)]
+    driver_extra: Vec<String>,
 
     #[clap(long, help = CUSTOM_CONFIG_HELP, long_help = CUSTOM_CONFIG_LONG_HELP)]
     custom_config: Option<String>,
@@ -77,9 +81,21 @@ fn main() {
     }
 
     // setup soapysdr driver
-    let driver = format!("driver={}", options.driver);
-    println!("[-] using soapysdr driver: {driver}");
-    let d = soapysdr::Device::new(&*driver).unwrap();
+    let mut driver = String::new();
+    driver.push_str(&format!("driver={}", options.driver));
+
+    for e in options.driver_extra {
+        driver.push_str(&format!(",{e}"));
+    }
+
+    println!("[-] using soapysdr driver_args: {driver}");
+    let d = match soapysdr::Device::new(&*driver) {
+        Ok(d) => d,
+        Err(e) => {
+            println!("[!] soapysdr error: {e}");
+            return;
+        }
+    };
 
     // check if --driver exists in config, with selected driver
     let channel = if let Some(sdr) = config.sdrs.iter().find(|a| a.driver == options.driver) {
