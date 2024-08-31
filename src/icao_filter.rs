@@ -3,9 +3,18 @@
 use std::sync::Mutex;
 
 const ICAO_FILTER_SIZE: u32 = 4096;
+pub const ICAO_FILTER_ADSB_NT: u32 = 1 << 25;
 
 static ICAO_FILTER_A: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
 static ICAO_FILTER_B: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
+
+pub fn icao_flush() {
+    let mut i = ICAO_FILTER_A.lock().unwrap();
+    *i = [0; 4096];
+
+    let mut i = ICAO_FILTER_B.lock().unwrap();
+    *i = [0; 4096];
+}
 
 pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
 {
@@ -34,10 +43,29 @@ pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
 }
 
 // The original function uses a integer return value, but it's used as a boolean
+pub fn icao_filter_add(addr: u32) {
+    let mut h: u32 = icao_hash(addr);
+    let h0: u32 = h;
+    if let Ok(mut icao_filter_a) = ICAO_FILTER_A.lock() {
+        while (icao_filter_a[h as usize] != 0) && (icao_filter_a[h as usize] != addr) {
+            h = (h + 1) & (ICAO_FILTER_SIZE - 1);
+            if h == h0 {
+                eprintln!("icao24 hash table full");
+                return;
+            }
+        }
+
+        if icao_filter_a[h as usize] == 0 {
+            icao_filter_a[h as usize] = addr;
+        }
+    }
+}
+
+// The original function uses a integer return value, but it's used as a boolean
 pub fn icao_filter_test(addr: u32) -> bool // icao_filter.c:96
 {
     let mut h: u32 = icao_hash(addr);
-    let h0: u32 = icao_hash(addr);
+    let h0: u32 = h;
 
     if let (Ok(icao_filter_a), Ok(icao_filter_b)) = (ICAO_FILTER_A.lock(), ICAO_FILTER_B.lock()) {
         'loop_a: while (icao_filter_a[h as usize] != 0) && (icao_filter_a[h as usize] != addr) {

@@ -4,6 +4,7 @@ use std::io::Write;
 use std::net::{IpAddr, TcpListener};
 
 use clap::Parser;
+use libdump1090_rs::demod_2400::demodulate2400;
 use libdump1090_rs::utils;
 use num_complex::Complex;
 use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
@@ -59,6 +60,10 @@ struct Options {
 
     #[clap(long, help = CUSTOM_CONFIG_HELP, long_help = CUSTOM_CONFIG_LONG_HELP)]
     custom_config: Option<String>,
+
+    /// don't display hex output of messages
+    #[clap(long)]
+    quiet: bool,
 }
 
 // main will exit as 0 for success, 1 on error
@@ -159,16 +164,19 @@ fn main() {
                 // demodulate new data
                 let buf = &buf[..len];
                 let outbuf = utils::to_mag(buf);
-                let resulting_data = libdump1090_rs::demod_2400::demodulate2400(&outbuf).unwrap();
+                let resulting_data = demodulate2400(&outbuf).unwrap();
 
                 // send new data to connected clients
                 if !resulting_data.is_empty() {
                     let resulting_data: Vec<String> = resulting_data
                         .iter()
                         .map(|a| {
-                            let a = hex::encode(a);
-                            let a = format!("*{a};\n");
-                            println!("{}", &a[..a.len() - 1]);
+                            let msg = a.buffer();
+                            let h = hex::encode(msg);
+                            let a = format!("*{h};\n");
+                            if !options.quiet {
+                                println!("{}", &a[..a.len() - 1]);
+                            }
                             a
                         })
                         .collect();

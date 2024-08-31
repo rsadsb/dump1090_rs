@@ -16,14 +16,14 @@ pub mod utils;
 
 // private
 mod crc;
-mod icao_filter;
+pub mod icao_filter;
 mod mode_s;
 
 pub const MODES_MAG_BUF_SAMPLES: usize = 131_072;
 
 const TRAILING_SAMPLES: usize = 326;
-const MODES_LONG_MSG_BYTES: usize = 14;
-const MODES_SHORT_MSG_BYTES: usize = 7;
+pub const MODES_LONG_MSG_BYTES: usize = 14;
+pub const MODES_SHORT_MSG_BYTES: usize = 7;
 
 // dump1090.h:252
 #[derive(Copy, Clone, Debug)]
