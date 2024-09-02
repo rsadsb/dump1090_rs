@@ -24,7 +24,7 @@ If you have tested this project on devices not listed below, let me know!
 
 
 ## Usage
-**Minimum Supported Rust Version**: 1.70.0
+**Minimum Supported Rust Version**: 1.74.0
 
 ## Build
 
