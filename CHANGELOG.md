@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+## [v0.8.0] 2024-09-02
+- Update MSRV to `1.74` to [!130](https://github.com/rsadsb/dump1090_rs/pull/130)
+- Properly decode short ADSB messages, thanks [@gariac](https://github.com/gariac) for finding. [!130](https://github.com/rsadsb/dump1090_rs/pull/130)
+- Add `--quiet` to remove hex output of decoded message bytes [!130](https://github.com/rsadsb/dump1090_rs/pull/130)
+
 ## [v0.7.1] 2024-02-10
 - Add `--driver-extra` to specify additional sopaysdr device options [!108](https://github.com/rsadsb/dump1090_rs/pull/108)
 

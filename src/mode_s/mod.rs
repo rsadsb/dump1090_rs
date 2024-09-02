@@ -1,6 +1,12 @@
 // This module includes functionality translated from mode_s.c
 
-use crate::{MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES};
+use crate::{
+    demod_2400::MsgLen,
+    icao_filter::{icao_filter_add, ICAO_FILTER_ADSB_NT},
+    MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
+};
+
+use super::{crc::modes_checksum, icao_filter::icao_filter_test};
 
 // mode_s.c:215
 #[must_use]
@@ -24,28 +30,29 @@ pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize 
 
 // mode_s.c:289
 #[must_use]
-pub fn score_modes_message(msg: &[u8]) -> i32 {
+pub fn score_modes_message(msg: &[u8]) -> Option<(MsgLen, i32)> {
     let validbits = msg.len() * 8;
 
     if validbits < 56 {
-        return -2;
+        return None;
     }
 
-    let msgtype = getbits(msg, 1, 5);
-    let msgbits =
-        if (msgtype & 0x10) != 0 { MODES_LONG_MSG_BYTES * 8 } else { MODES_SHORT_MSG_BYTES * 8 };
+    let df = getbits(msg, 1, 5);
+    let (msgbits, msglen) = if (df & 0x10) != 0 {
+        (MODES_LONG_MSG_BYTES * 8, MsgLen::Long)
+    } else {
+        (MODES_SHORT_MSG_BYTES * 8, MsgLen::Short)
+    };
 
     if validbits < msgbits {
-        return -2;
+        return None;
     }
     if msg.iter().all(|b| *b == 0x00) {
-        return -2;
+        return None;
     }
 
-    let crc = super::crc::modes_checksum(msg, msgbits);
-
-    match msgtype {
-        0 | 4 | 5 | 16 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 => {
+    let res = match df {
+        0 | 4 | 5 => {
             // 0:  short air-air surveillance
             // 4:  surveillance, altitude reply
             // 5:  surveillance, altitude reply
@@ -59,7 +66,8 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
             // 30: Comm-D (ELM)
             // 31: Comm-D (ELM)
 
-            if super::icao_filter::icao_filter_test(crc) {
+            let crc = modes_checksum(msg, msgbits);
+            if icao_filter_test(crc) {
                 1000
             } else {
                 -1
@@ -67,13 +75,17 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
         }
         11 => {
             // 11: All-call reply
+            let crc = modes_checksum(msg, msgbits);
             let iid = crc & 0x7f;
             let crc = crc & 0x00ff_ff80;
             let addr = getbits(msg, 9, 32) as u32;
 
-            match (crc, iid, super::icao_filter::icao_filter_test(addr)) {
+            match (crc, iid, icao_filter_test(addr)) {
                 (0, 0, true) => 1600,
-                (0, 0, false) => 750,
+                (0, 0, false) => {
+                    icao_filter_add(addr);
+                    750
+                }
                 (0, _, true) => 1000,
                 (0, _, false) => -1,
                 (_, _, _) => -2,
@@ -84,20 +96,47 @@ pub fn score_modes_message(msg: &[u8]) -> i32 {
             // 18: Extended squitter/non-transponder
             let addr = getbits(msg, 9, 32) as u32;
 
-            match (crc, super::icao_filter::icao_filter_test(addr)) {
+            let crc = modes_checksum(msg, msgbits);
+            match (crc, icao_filter_test(addr)) {
                 (0, true) => 1800,
-                (0, false) => 1400,
+                (0, false) => {
+                    if df == 17 {
+                        icao_filter_add(addr);
+                    } else {
+                        icao_filter_add(addr | ICAO_FILTER_ADSB_NT);
+                    }
+                    1400
+                }
                 (_, _) => -2,
             }
         }
-        20 | 21 => {
+        16 | 20 | 21 => {
+            // 16: long air-air surveillance
             // 20: Comm-B, altitude reply
             // 21: Comm-B, identity reply
-            match super::icao_filter::icao_filter_test(crc) {
+            let crc = modes_checksum(msg, MODES_LONG_MSG_BYTES * 8);
+            match icao_filter_test(crc) {
+                true => 1000,
+                false => -2,
+            }
+        }
+        24..=31 => {
+            // 24: Comm-D (ELM)
+            // 25: Comm-D (ELM)
+            // 26: Comm-D (ELM)
+            // 27: Comm-D (ELM)
+            // 28: Comm-D (ELM)
+            // 29: Comm-D (ELM)
+            // 30: Comm-D (ELM)
+            // 31: Comm-D (ELM)
+            let crc = modes_checksum(msg, MODES_LONG_MSG_BYTES * 8);
+            match icao_filter_test(crc) {
                 true => 1000,
                 false => -2,
             }
         }
         _ => -2,
-    }
+    };
+
+    Some((msglen, res))
 }

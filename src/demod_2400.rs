@@ -1,6 +1,8 @@
 // This module includes functionality translated from demod_2400.c
 
-use crate::{mode_s, MagnitudeBuffer, MODES_LONG_MSG_BYTES};
+use crate::{
+    mode_s::score_modes_message, MagnitudeBuffer, MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
+};
 
 #[derive(Clone, Copy, Debug)]
 enum Phase {
@@ -77,7 +79,34 @@ impl Phase {
     }
 }
 
-pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static str> {
+#[derive(Debug, PartialEq, Eq)]
+pub enum MsgLen {
+    Short,
+    Long,
+}
+
+#[derive(Debug)]
+pub struct ModeSMessage {
+    /// Type of message
+    msglen: MsgLen,
+    /// Binary message
+    msg: [u8; MODES_LONG_MSG_BYTES],
+    ///  RSSI, in the range [0..1], as a fraction of full-scale power
+    signal_level: f64,
+    /// Scoring from scoreModesMessage, if used
+    score: i32,
+}
+
+impl ModeSMessage {
+    pub fn buffer(&self) -> &[u8] {
+        match self.msglen {
+            MsgLen::Short => &self.msg[..MODES_SHORT_MSG_BYTES],
+            MsgLen::Long => &self.msg[..MODES_LONG_MSG_BYTES],
+        }
+    }
+}
+
+pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'static str> {
     let mut results = vec![];
 
     let data = &mag.data;
@@ -111,10 +140,15 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
             }
 
             // Try all phases
-            let mut bestmsg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
-            let mut bestscore: i32 = -2;
+            let mut bestmsg = ModeSMessage {
+                msg: [0_u8; MODES_LONG_MSG_BYTES],
+                signal_level: 0.,
+                score: -2,
+                msglen: MsgLen::Short,
+            };
 
             let mut msg: [u8; MODES_LONG_MSG_BYTES] = [0_u8; MODES_LONG_MSG_BYTES];
+
             for try_phase in 4..9 {
                 let mut slice_loc: usize = j + 19 + (try_phase / 5);
                 let mut phase = Phase::from(try_phase);
@@ -141,18 +175,29 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<[u8; 14]>, &'static s
                     phase = starting_phase.next_start();
                 }
 
-                let score = mode_s::score_modes_message(&msg);
+                if let Some((msglen, score)) = score_modes_message(&msg) {
+                    if score > bestmsg.score {
+                        bestmsg.msglen = msglen;
+                        bestmsg.msg.clone_from_slice(&msg);
+                        bestmsg.score = score;
 
-                if score > bestscore {
-                    bestmsg.clone_from_slice(&msg);
-                    bestscore = score;
+                        let mut scaled_signal_power = 0_u64;
+                        let signal_len = msg.len() * 12 / 5;
+                        for k in 0..signal_len {
+                            let mag = data[j + 19 + k] as u64;
+                            scaled_signal_power += mag * mag;
+                        }
+                        let signal_power = scaled_signal_power as f64 / 65535.0 / 65535.0;
+                        bestmsg.signal_level = signal_power / signal_len as f64;
+                    }
                 }
             }
 
             // Do we have a candidate?
-            if bestscore < 0 {
+            if bestmsg.score < 0 {
                 continue 'jloop;
             }
+
             results.push(bestmsg);
         }
     }

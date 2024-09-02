@@ -10,7 +10,7 @@ rust-version.workspace = true
 clap = {version = "4.4.8", features = ["color", "derive", "wrap_help"]}
 num-complex = "0.4.4"
 soapysdr = "0.4.0"
-libdump1090_rs = { path = "../", version = "0.7.0" }
+libdump1090_rs = { path = "../", version = "0.8.0" }
 hex = "0.4.0"
 toml = "0.8.8"
 serde = { version = "1.0.197", features = ["derive"] }
