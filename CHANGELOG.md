@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v0.8.1] 2024-09-03
+- Restore performance for recent rustc versions, force more functions to be inlined [!135](https://github.com/rsadsb/dump1090_rs/pull/135)
+
 ## [v0.8.0] 2024-09-02
 - Update MSRV to `1.74` to [!130](https://github.com/rsadsb/dump1090_rs/pull/130)
 - Properly decode short ADSB messages, thanks [@gariac](https://github.com/gariac) for finding. [!130](https://github.com/rsadsb/dump1090_rs/pull/130)

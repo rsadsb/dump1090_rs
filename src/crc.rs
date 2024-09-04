@@ -259,6 +259,7 @@ pub const CRC_TABLE: [u32; 256] = [
     0x00fa_0480,
 ];
 
+#[inline]
 pub fn modes_checksum(message: &[u8], bits: usize) -> u32 {
     let mut rem: u32 = 0;
     let n = bits / 8;
