@@ -19,6 +19,7 @@ enum Phase {
 }
 
 impl From<usize> for Phase {
+    #[inline(always)]
     fn from(num: usize) -> Self {
         match num % 5 {
             0 => Self::Zero,
@@ -33,6 +34,7 @@ impl From<usize> for Phase {
 
 impl Phase {
     /// Increment from 0..4 for incrementing the starting phase
+    #[inline(always)]
     fn next_start(self) -> Self {
         match self {
             Self::Zero => Self::One,
@@ -44,6 +46,7 @@ impl Phase {
     }
 
     /// Increment by expected next phase transition for bit denoting
+    #[inline(always)]
     fn next(self) -> Self {
         match self {
             Self::Zero => Self::Two,
@@ -55,6 +58,7 @@ impl Phase {
     }
 
     /// Amount of mag indexs used, for adding to the next start index
+    #[inline(always)]
     fn increment_index(self, index: usize) -> usize {
         index
             + match self {
@@ -98,6 +102,7 @@ pub struct ModeSMessage {
 }
 
 impl ModeSMessage {
+    #[inline(always)]
     pub fn buffer(&self) -> &[u8] {
         match self.msglen {
             MsgLen::Short => &self.msg[..MODES_SHORT_MSG_BYTES],
@@ -106,6 +111,7 @@ impl ModeSMessage {
     }
 }
 
+#[inline(always)]
 pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'static str> {
     let mut results = vec![];
 
@@ -205,6 +211,7 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
     Ok(results)
 }
 
+#[inline(always)]
 fn check_preamble(preamble: &[u16]) -> Option<(i32, u32, u32)> {
     // This gets rid of the 3 core::panicking::panic_bounds_check calls,
     // but doesn't look to improve performance

@@ -10,6 +10,7 @@ use super::{crc::modes_checksum, icao_filter::icao_filter_test};
 
 // mode_s.c:215
 #[must_use]
+#[inline(always)]
 pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize {
     let mut ans: usize = 0;
 
@@ -33,7 +34,7 @@ pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize 
 pub fn score_modes_message(msg: &[u8]) -> Option<(MsgLen, i32)> {
     let validbits = msg.len() * 8;
 
-    if validbits < 56 {
+    if validbits < MODES_SHORT_MSG_BYTES * 8 {
         return None;
     }
 

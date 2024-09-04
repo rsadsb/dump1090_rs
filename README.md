@@ -104,9 +104,9 @@ Reading from a 512KB iq sample to ADS-B bytes takes ~3.0 ms, but feel free to ru
 
 ### Intel i7-7700K CPU @ 4.20GHz
 ```
-01                      time:   [2.9850 ms 2.9859 ms 2.9868 ms]
-02                      time:   [2.9260 ms 2.9279 ms 2.9308 ms]
-03                      time:   [2.8449 ms 2.8525 ms 2.8653 ms]
+01                      time:   [3.6691 ms 3.6950 ms 3.7264 ms]
+02                      time:   [3.5941 ms 3.5987 ms 3.6040 ms]
+03                      time:   [3.4930 ms 3.4961 ms 3.4994 ms]
 ```
 
 # Changes
