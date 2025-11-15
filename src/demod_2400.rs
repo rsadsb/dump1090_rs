@@ -1,7 +1,9 @@
 // This module includes functionality translated from demod_2400.c
 
 use crate::{
-    mode_s::score_modes_message, MagnitudeBuffer, MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
+    mode_s::score_modes_message,
+    crc::fix_single_bit_error,
+    MagnitudeBuffer, MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -68,17 +70,21 @@ impl Phase {
     }
 
     /// Calculate the PPM bit
+    ///
+    /// Coefficients updated 2020 by wiedehopf (readsb) - hand-tuned on real samples
+    /// for better weak-signal performance. See readsb demod_2400.c lines 74-93.
+    /// Note: phase2 is slightly DC unbalanced but produces better results.
     #[inline(always)]
     fn calculate_bit(self, m: &[u16]) -> i32 {
         let m0 = i32::from(m[0]);
         let m1 = i32::from(m[1]);
         let m2 = i32::from(m[2]);
         match self {
-            Self::Zero => 5 * m0 - 3 * m1 - 2 * m2,
-            Self::One => 4 * m0 - m1 - 3 * m2,
-            Self::Two => 3 * m0 + m1 - 4 * m2,
-            Self::Three => 2 * m0 + 3 * m1 - 5 * m2,
-            Self::Four => m0 + 5 * m1 - 5 * m2 - i32::from(m[3]),
+            Self::Zero => 18 * m0 - 15 * m1 - 3 * m2,
+            Self::One => 14 * m0 - 5 * m1 - 9 * m2,
+            Self::Two => 16 * m0 + 5 * m1 - 20 * m2,
+            Self::Three => 7 * m0 + 11 * m1 - 18 * m2,
+            Self::Four => 4 * m0 + 15 * m1 - 20 * m2 + i32::from(m[3]),
         }
     }
 }
@@ -113,7 +119,8 @@ impl ModeSMessage {
 
 #[inline(always)]
 pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'static str> {
-    let mut results = vec![];
+    // Pre-allocate capacity for typical message count (reduces reallocations)
+    let mut results = Vec::with_capacity(64);
 
     let data = &mag.data;
 
@@ -132,17 +139,22 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
             }
 
             // Check that the "quiet" bits 6,7,15,16,17 are actually quiet
-            if i32::from(data[j + 5]) >= high
-                || i32::from(data[j + 6]) >= high
-                || i32::from(data[j + 7]) >= high
-                || i32::from(data[j + 8]) >= high
-                || i32::from(data[j + 14]) >= high
-                || i32::from(data[j + 15]) >= high
-                || i32::from(data[j + 16]) >= high
-                || i32::from(data[j + 17]) >= high
-                || i32::from(data[j + 18]) >= high
-            {
-                continue 'jloop;
+            // Safety: j < mag.length <= MODES_MAG_BUF_SAMPLES (131072),
+            // and data.len() = TRAILING_SAMPLES + MODES_MAG_BUF_SAMPLES (131398),
+            // so j+18 < 131090 which is always < 131398. Bounds are guaranteed.
+            unsafe {
+                if i32::from(*data.get_unchecked(j + 5)) >= high
+                    || i32::from(*data.get_unchecked(j + 6)) >= high
+                    || i32::from(*data.get_unchecked(j + 7)) >= high
+                    || i32::from(*data.get_unchecked(j + 8)) >= high
+                    || i32::from(*data.get_unchecked(j + 14)) >= high
+                    || i32::from(*data.get_unchecked(j + 15)) >= high
+                    || i32::from(*data.get_unchecked(j + 16)) >= high
+                    || i32::from(*data.get_unchecked(j + 17)) >= high
+                    || i32::from(*data.get_unchecked(j + 18)) >= high
+                {
+                    continue 'jloop;
+                }
             }
 
             // Try all phases
@@ -204,7 +216,32 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
                 continue 'jloop;
             }
 
-            results.push(bestmsg);
+            // Try to recover messages with single-bit errors if CRC failed but we have data
+            if bestmsg.score < 1000 {
+                let msgbits = match bestmsg.msglen {
+                    MsgLen::Short => MODES_SHORT_MSG_BYTES * 8,
+                    MsgLen::Long => MODES_LONG_MSG_BYTES * 8,
+                };
+
+                let msg_slice = match bestmsg.msglen {
+                    MsgLen::Short => &mut bestmsg.msg[..MODES_SHORT_MSG_BYTES],
+                    MsgLen::Long => &mut bestmsg.msg[..MODES_LONG_MSG_BYTES],
+                };
+
+                if fix_single_bit_error(msg_slice, msgbits).is_some() {
+                    // Successfully corrected! Re-score the message
+                    if let Some((_, new_score)) = score_modes_message(msg_slice) {
+                        if new_score > bestmsg.score {
+                            bestmsg.score = new_score;
+                        }
+                    }
+                }
+            }
+
+            // Final check - only push if we have a valid score
+            if bestmsg.score >= 0 {
+                results.push(bestmsg);
+            }
         }
     }
 
