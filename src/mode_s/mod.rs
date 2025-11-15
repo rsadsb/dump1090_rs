@@ -6,7 +6,7 @@ use crate::{
     MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
 };
 
-use super::{crc::modes_checksum, icao_filter::icao_filter_test};
+use super::{crc::{modes_checksum, fix_single_bit_error}, icao_filter::icao_filter_test};
 
 // mode_s.c:215
 #[must_use]
@@ -18,11 +18,11 @@ pub fn getbits(data: &[u8], firstbit_1idx: usize, lastbit_1idx: usize) -> usize 
     let (firstbit, lastbit) = (firstbit_1idx - 1, lastbit_1idx - 1);
 
     for bit_idx in firstbit..=lastbit {
-        ans *= 2;
+        ans <<= 1;
         let byte_idx: usize = bit_idx / 8;
-        let mask = 2_u8.pow(7_u32 - (bit_idx as u32) % 8);
+        let mask = 1u8 << (7 - (bit_idx % 8));
         if (data[byte_idx] & mask) != 0_u8 {
-            ans += 1;
+            ans |= 1;
         }
     }
 

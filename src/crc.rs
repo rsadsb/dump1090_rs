@@ -1,5 +1,7 @@
 //This module includes functionality translated from mode_s.c
 
+use std::sync::OnceLock;
+
 pub const CRC_TABLE: [u32; 256] = [
     0x0000_0000,
     0x00ff_f409,
@@ -279,4 +281,62 @@ pub fn modes_checksum(message: &[u8], bits: usize) -> u32 {
     rem ^= xor_term;
 
     rem
+}
+
+// Single-bit error correction syndrome tables
+static SINGLE_BIT_SYNDROME_SHORT: OnceLock<Vec<u32>> = OnceLock::new();
+static SINGLE_BIT_SYNDROME_LONG: OnceLock<Vec<u32>> = OnceLock::new();
+
+fn init_single_bit_syndromes() -> (Vec<u32>, Vec<u32>) {
+    let mut short_syndromes = Vec::with_capacity(56);
+    let mut long_syndromes = Vec::with_capacity(112);
+
+    // Generate syndromes for short messages (56 bits)
+    let mut msg = [0u8; 7];
+    for i in 0..56 {
+        msg[i / 8] ^= 1 << (7 - (i & 7));
+        short_syndromes.push(modes_checksum(&msg, 56));
+        msg[i / 8] ^= 1 << (7 - (i & 7));
+    }
+
+    // Generate syndromes for long messages (112 bits)
+    let mut msg = [0u8; 14];
+    for i in 0..112 {
+        msg[i / 8] ^= 1 << (7 - (i & 7));
+        long_syndromes.push(modes_checksum(&msg, 112));
+        msg[i / 8] ^= 1 << (7 - (i & 7));
+    }
+
+    (short_syndromes, long_syndromes)
+}
+
+/// Attempt to repair a single-bit error in a Mode S message
+/// Returns the bit position that was flipped, or None if no single-bit error found
+pub fn fix_single_bit_error(message: &mut [u8], bits: usize) -> Option<usize> {
+    let syndrome = modes_checksum(message, bits);
+
+    if syndrome == 0 {
+        return None; // No error
+    }
+
+    let syndromes = if bits == 56 {
+        SINGLE_BIT_SYNDROME_SHORT.get_or_init(|| init_single_bit_syndromes().0)
+    } else if bits == 112 {
+        SINGLE_BIT_SYNDROME_LONG.get_or_init(|| init_single_bit_syndromes().1)
+    } else {
+        return None; // Unsupported message length
+    };
+
+    // Look for matching syndrome
+    for (bit_pos, &bit_syndrome) in syndromes.iter().enumerate() {
+        if syndrome == bit_syndrome {
+            // Found the error bit - flip it
+            let byte_idx = bit_pos / 8;
+            let bit_mask = 1u8 << (7 - (bit_pos & 7));
+            message[byte_idx] ^= bit_mask;
+            return Some(bit_pos);
+        }
+    }
+
+    None // No single-bit error pattern matched
 }
