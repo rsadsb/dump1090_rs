@@ -109,6 +109,20 @@ impl ModeSMessage {
             MsgLen::Long => &self.msg[..MODES_LONG_MSG_BYTES],
         }
     }
+
+    /// Returns the RSSI (Received Signal Strength Indicator) as a fraction of full-scale power.
+    /// Range: [0..1]
+    #[inline(always)]
+    pub fn signal_level(&self) -> f64 {
+        self.signal_level
+    }
+
+    /// Returns the message quality score from CRC validation.
+    /// Higher scores indicate better quality messages.
+    #[inline(always)]
+    pub fn score(&self) -> i32 {
+        self.score
+    }
 }
 
 #[inline(always)]
