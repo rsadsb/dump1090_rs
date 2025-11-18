@@ -215,10 +215,6 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
                         // Normalize by dividing by 65535^2, then average over signal length
                         let signal_power = scaled_signal_power as f64 / 65535.0 / 65535.0;
                         bestmsg.signal_level = signal_power / signal_len as f64;
-
-                        // Debug: log signal_level calculation
-                        eprintln!("DEBUG: Calculated signal_level={:.6} (signal_power={:.6}, signal_len={}, scaled_power={})",
-                                  bestmsg.signal_level, signal_power, signal_len, scaled_signal_power);
                     }
                 }
             }

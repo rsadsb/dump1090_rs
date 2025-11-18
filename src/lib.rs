@@ -45,7 +45,9 @@ impl Default for MagnitudeBuffer {
 
 impl MagnitudeBuffer {
     pub fn push(&mut self, x: u16) {
-        self.data[TRAILING_SAMPLES + self.length] = x;
+        // Write data starting at index 0, not TRAILING_SAMPLES offset
+        // The demodulator reads from index 0, so data must start there
+        self.data[self.length] = x;
         self.length += 1;
     }
 }
