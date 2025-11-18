@@ -199,14 +199,26 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
                         bestmsg.msg.clone_from_slice(&msg);
                         bestmsg.score = score;
 
+                        // Calculate signal level based on actual message length
+                        let msg_bytes = match bestmsg.msglen {
+                            MsgLen::Short => MODES_SHORT_MSG_BYTES,
+                            MsgLen::Long => MODES_LONG_MSG_BYTES,
+                        };
                         let mut scaled_signal_power = 0_u64;
-                        let signal_len = msg.len() * 12 / 5;
+                        let signal_len = msg_bytes * 12 / 5;
                         for k in 0..signal_len {
                             let mag = data[j + 19 + k] as u64;
                             scaled_signal_power += mag * mag;
                         }
+                        // Calculate signal level (same formula as dump1090-fa/readsb)
+                        // scaled_signal_power is sum of mag^2, where mag is u16 (0-65535)
+                        // Normalize by dividing by 65535^2, then average over signal length
                         let signal_power = scaled_signal_power as f64 / 65535.0 / 65535.0;
                         bestmsg.signal_level = signal_power / signal_len as f64;
+
+                        // Debug: log signal_level calculation
+                        eprintln!("DEBUG: Calculated signal_level={:.6} (signal_power={:.6}, signal_len={}, scaled_power={})",
+                                  bestmsg.signal_level, signal_power, signal_len, scaled_signal_power);
                     }
                 }
             }
