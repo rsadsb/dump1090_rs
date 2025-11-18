@@ -233,6 +233,18 @@ pub fn demodulate2400(mag: &MagnitudeBuffer) -> Result<Vec<ModeSMessage>, &'stat
                     if let Some((_, new_score)) = score_modes_message(msg_slice) {
                         if new_score > bestmsg.score {
                             bestmsg.score = new_score;
+
+                            // Recalculate signal_level if it wasn't set yet (all phases failed initially)
+                            if bestmsg.signal_level == 0.0 {
+                                let mut scaled_signal_power = 0_u64;
+                                let signal_len = msg_slice.len() * 12 / 5;
+                                for k in 0..signal_len {
+                                    let mag = data[j + 19 + k] as u64;
+                                    scaled_signal_power += mag * mag;
+                                }
+                                let signal_power = scaled_signal_power as f64 / 65535.0 / 65535.0;
+                                bestmsg.signal_level = signal_power / signal_len as f64;
+                            }
                         }
                     }
                 }
