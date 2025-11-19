@@ -40,18 +40,31 @@ pub fn read_test_data(filepath: &str) -> [Complex<i16>; 0x20000] {
 }
 
 #[must_use]
+#[inline]
 pub fn to_mag(data: &[Complex<i16>]) -> MagnitudeBuffer {
     let mut outbuf = MagnitudeBuffer::default();
+
     for b in data {
-        // TODO: lookup table
+        // Use exact sqrt calculation to preserve message decoding accuracy
+        // Note: Approximations (alpha-max-beta-min, lookup tables) cause
+        // incorrect message decoding due to sensitivity in preamble detection
+        // and phase-locked loop. This matches what all modern dump1090
+        // implementations do for SC16 format (see dump1090-mutability,
+        // readsb, SDRplay/dump1090 convert.c)
         let i = b.im;
         let q = b.re;
 
-        let fi = f32::from(i) / (1 << 15) as f32;
-        let fq = f32::from(q) / (1 << 15) as f32;
+        let fi = f32::from(i) / 32768.0;
+        let fq = f32::from(q) / 32768.0;
 
-        let mag_sqr = fi.mul_add(fi, fq * fq);
+        let mut mag_sqr = fi.mul_add(fi, fq * fq);
+        // Clamp to 1.0 to handle any floating-point rounding edge cases
+        // (matching readsb's approach)
+        if mag_sqr > 1.0 {
+            mag_sqr = 1.0;
+        }
         let mag = f32::sqrt(mag_sqr);
+
         outbuf.push(mag.mul_add(f32::from(u16::MAX), 0.5) as u16);
     }
     outbuf

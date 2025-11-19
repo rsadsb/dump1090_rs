@@ -1,18 +1,18 @@
 //This module includes functionality translated from icao_filter.c
 
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 const ICAO_FILTER_SIZE: u32 = 4096;
 pub const ICAO_FILTER_ADSB_NT: u32 = 1 << 25;
 
-static ICAO_FILTER_A: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
-static ICAO_FILTER_B: Mutex<[u32; 4096]> = Mutex::new([0; 4096]);
+static ICAO_FILTER_A: RwLock<[u32; 4096]> = RwLock::new([0; 4096]);
+static ICAO_FILTER_B: RwLock<[u32; 4096]> = RwLock::new([0; 4096]);
 
 pub fn icao_flush() {
-    let mut i = ICAO_FILTER_A.lock().unwrap();
+    let mut i = ICAO_FILTER_A.write().unwrap();
     *i = [0; 4096];
 
-    let mut i = ICAO_FILTER_B.lock().unwrap();
+    let mut i = ICAO_FILTER_B.write().unwrap();
     *i = [0; 4096];
 }
 
@@ -46,7 +46,7 @@ pub fn icao_hash(a32: u32) -> u32 // icao_filter.c:38
 pub fn icao_filter_add(addr: u32) {
     let mut h: u32 = icao_hash(addr);
     let h0: u32 = h;
-    if let Ok(mut icao_filter_a) = ICAO_FILTER_A.lock() {
+    if let Ok(mut icao_filter_a) = ICAO_FILTER_A.write() {
         while (icao_filter_a[h as usize] != 0) && (icao_filter_a[h as usize] != addr) {
             h = (h + 1) & (ICAO_FILTER_SIZE - 1);
             if h == h0 {
@@ -67,7 +67,7 @@ pub fn icao_filter_test(addr: u32) -> bool // icao_filter.c:96
     let mut h: u32 = icao_hash(addr);
     let h0: u32 = h;
 
-    if let (Ok(icao_filter_a), Ok(icao_filter_b)) = (ICAO_FILTER_A.lock(), ICAO_FILTER_B.lock()) {
+    if let (Ok(icao_filter_a), Ok(icao_filter_b)) = (ICAO_FILTER_A.read(), ICAO_FILTER_B.read()) {
         'loop_a: while (icao_filter_a[h as usize] != 0) && (icao_filter_a[h as usize] != addr) {
             h = (h + 1) & (ICAO_FILTER_SIZE - 1);
             if h == h0 {
