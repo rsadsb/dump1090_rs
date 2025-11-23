@@ -1,6 +1,6 @@
 use std::hint::black_box;
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use libdump1090_rs::{demod_2400::demodulate2400, icao_filter::icao_flush, utils};
 use num_complex::Complex;
 

@@ -1,9 +1,9 @@
 // This module includes functionality translated from mode_s.c
 
 use crate::{
-    demod_2400::MsgLen,
-    icao_filter::{icao_filter_add, ICAO_FILTER_ADSB_NT},
     MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
+    demod_2400::MsgLen,
+    icao_filter::{ICAO_FILTER_ADSB_NT, icao_filter_add},
 };
 
 use super::{crc::modes_checksum, icao_filter::icao_filter_test};
@@ -68,11 +68,7 @@ pub fn score_modes_message(msg: &[u8]) -> Option<(MsgLen, i32)> {
             // 31: Comm-D (ELM)
 
             let crc = modes_checksum(msg, msgbits);
-            if icao_filter_test(crc) {
-                1000
-            } else {
-                -1
-            }
+            if icao_filter_test(crc) { 1000 } else { -1 }
         }
         11 => {
             // 11: All-call reply

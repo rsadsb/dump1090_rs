@@ -7,7 +7,7 @@ use clap::Parser;
 use libdump1090_rs::demod_2400::demodulate2400;
 use libdump1090_rs::utils;
 use num_complex::Complex;
-use sdrconfig::{SdrConfig, DEFAULT_CONFIG};
+use sdrconfig::{DEFAULT_CONFIG, SdrConfig};
 use soapysdr::Direction;
 
 const DIRECTION: Direction = Direction::Rx;

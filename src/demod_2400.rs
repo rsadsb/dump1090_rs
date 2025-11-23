@@ -1,7 +1,7 @@
 // This module includes functionality translated from demod_2400.c
 
 use crate::{
-    mode_s::score_modes_message, MagnitudeBuffer, MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES,
+    MODES_LONG_MSG_BYTES, MODES_SHORT_MSG_BYTES, MagnitudeBuffer, mode_s::score_modes_message,
 };
 
 #[derive(Clone, Copy, Debug)]
