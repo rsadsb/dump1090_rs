@@ -7,7 +7,7 @@ rust-version.workspace = true
 [workspace.package]
 edition = "2024"
 version = "0.8.1"
-rust-version = "1.85.0"
+rust-version = "1.88.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
