@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: dtolnay/rust-toolchain@c5a29ddb4d9d194e7c84ec8c3fba61b1c31fee8c # master
         with:
+          toolchain: stable
           target: ${{ matrix.targets }}
       - run: cargo install cargo-quickinstall
       - run: cargo quickinstall cross@0.2.5 --force
