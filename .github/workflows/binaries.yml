@@ -24,8 +24,10 @@ jobs:
         with:
           toolchain: stable
           target: ${{ matrix.targets }}
-      - run: cargo install cargo-quickinstall
-      - run: cargo quickinstall cross@0.2.5 --force
+      # TODO: fix this. request failed.
+      # - run: cargo install cargo-quickinstall
+      # - run: cargo quickinstall cross@0.2.5 --force
+      - run: cargo install cross@0.2.5 --force
       - run: cross build --workspace --locked --release --target ${{ matrix.targets }}
 
       - name: archive
