@@ -30,6 +30,18 @@ channel = 0 # RX1
 key = "full"
 value = 35.0
 
+# USRP B210 (uhd)
+[[sdrs]]
+driver = "uhd"
+channel = 0
+
+[[sdrs.gain]]
+key = "PGA"
+value = 70.0
+
+[sdrs.antenna]
+name = "RX2"
+
 # Loading an FPGA image causes error due to SoapyBladeRF not subsequently closing and re-opening the device.
 #   Calibration TIMEOUT (0x16, 0x80)
 #   [ERROR @ host/libraries/libbladeRF/src/board/bladerf2/rfic_host.c:397] _rfic_host_set_sample_rate: ad9361_set_rx_sampling_freq(phy, rate) failed: An unexpected error occurred
@@ -58,16 +70,3 @@ value = 35.0
 #[[sdrs.setting]]
 #key = "biastee_rx"
 #value = "true"
-
-# USRP B210 (uhd)
-# NOT TESTED(see https://github.com/rsadsb/dump1090_rs/issues/23)
-#[[sdrs]]
-#driver = "udh"
-#channel = 0
-#
-#[[sdrs.gain]]
-#key = "example"
-#value = 0.0
-#
-#[sdrs.antenna]
-#name = "RX"
