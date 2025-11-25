@@ -756,9 +756,9 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "soapysdr"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b27a161677e5e211aabf2e668918e4b8207e4a197a697b14ec19fffbca99d428"
+checksum = "014f86124a6833ade3ca81b286e457eb76ab337321bc903c31b594dc3d1bf3d4"
 dependencies = [
  "log",
  "num-complex",

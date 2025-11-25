@@ -185,11 +185,11 @@ fn main() {
                     for (i, mut socket) in &mut sockets.iter().enumerate() {
                         for msg in &resulting_data {
                             // write, or add to remove list if ConnectionReset
-                            if let Err(e) = socket.write_all(msg.as_bytes()) {
-                                if e.kind() == std::io::ErrorKind::ConnectionReset {
-                                    remove_indexs.push(i);
-                                    break;
-                                }
+                            if let Err(e) = socket.write_all(msg.as_bytes())
+                                && e.kind() == std::io::ErrorKind::ConnectionReset
+                            {
+                                remove_indexs.push(i);
+                                break;
                             }
                         }
                     }

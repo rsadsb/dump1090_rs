@@ -30,8 +30,10 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.targets }}
-      - run: cargo install cargo-quickinstall
-      - run: cargo quickinstall cross@0.2.5 --force
+      # TODO: fix this. request failed.
+      # - run: cargo install cargo-quickinstall
+      # - run: cargo quickinstall cross@0.2.5 --force
+      - run: cargo install cross@0.2.5 --force
       - run: cross test --locked --workspace --target ${{ matrix.targets }}
 
   # fmt and clippy
