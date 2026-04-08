@@ -42,6 +42,14 @@ value = 70.0
 [sdrs.antenna]
 name = "RX2"
 
+# ADALM-PLUTO (PlutoSDR)
+[[sdrs]]
+driver = "plutosdr"
+
+[[sdrs.gain]]
+key = "PGA"
+value = 73.0
+
 # Loading an FPGA image causes error due to SoapyBladeRF not subsequently closing and re-opening the device.
 #   Calibration TIMEOUT (0x16, 0x80)
 #   [ERROR @ host/libraries/libbladeRF/src/board/bladerf2/rfic_host.c:397] _rfic_host_set_sample_rate: ad9361_set_rx_sampling_freq(phy, rate) failed: An unexpected error occurred
