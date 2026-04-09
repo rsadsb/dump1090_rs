@@ -1,0 +1,34 @@
+# Build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# Docker files (not needed for main build)
+docker/
+Dockerfile
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+
+# GitHub
+.github/
+
+# Test data
+test_iq/
