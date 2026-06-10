@@ -29,10 +29,10 @@ pub fn icao_flush() {
 ///   2. Age the current generation: move table A's contents into B.
 ///   3. Start fresh: clear table A.
 ///
-/// Why a swap and not `icao_flush`'s double-clear? `icao_filter_add` always writes
-/// A, and `icao_filter_test` checks A *then* B. So after a rotation, an aircraft seen
-/// in the previous cycle still answers `true` (via B) while A is rebuilt — giving each
-/// track a 60–120s lifetime. A double-clear would wipe active aircraft every cycle.
+/// Why age A into B instead of just clearing? `icao_filter_add` always writes A, and
+/// `icao_filter_test` checks A *then* B. So after a rotation, an aircraft seen in the
+/// previous cycle still answers `true` (via B) while A is rebuilt — giving each track a
+/// 60–120s lifetime. Clearing both tables outright would wipe active aircraft every cycle.
 ///
 /// LOCK ORDER: `icao_filter_test` (below) locks A then B. If you hold both locks at
 /// once here, take them in that SAME order or you can deadlock against `test`.
