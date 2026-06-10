@@ -151,6 +151,16 @@ fn main() {
 
     let mut sockets = vec![];
 
+    // Background task: periodically age out stale ICAO addresses so the filter
+    // table (src/icao_filter.rs) doesn't fill up and start logging
+    // "icao24 hash table full". The actual rotation lives in `icao_filter_expire`.
+    std::thread::spawn(|| {
+        loop {
+            std::thread::sleep(std::time::Duration::from_secs(60));
+            libdump1090_rs::icao_filter::icao_filter_expire();
+        }
+    });
+
     loop {
         // add more clients
         if let Ok((s, _addr)) = listener.accept() {
