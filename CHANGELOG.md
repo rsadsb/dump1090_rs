@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 - Update to Rust edition 2024, bump MSRV to `1.88`
+- Faster `demodulate2400` (about 45% less time on the benchmark, 4.8x on a noisy capture on a Cortex-A35): early DF filter and skipping decoded messages as in dump1090-fa, unrolled bit slicing, candidate checks out of the per-sample loop. Adjacent duplicate decodes of the same message are no longer returned.
 
 ## [v0.8.1] 2024-09-03
 - Restore performance for recent rustc versions, force more functions to be inlined [!135](https://github.com/rsadsb/dump1090_rs/pull/135)

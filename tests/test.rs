@@ -22,7 +22,6 @@ fn test_01() {
     let expected_data = Vec::from([
         hex!("8dad929358b9c6273f002169c02e").to_vec(),
         hex!("8daa2bc4f82100020049b8db9449").to_vec(),
-        hex!("8daa2bc4f82100020049b8db9449").to_vec(),
         hex!("02e1971ce17c84").to_vec(),
         hex!("8da0aaa058bf163fcf860013e840").to_vec(),
     ]);
@@ -50,7 +49,6 @@ fn test_03() {
         hex!("8da8aac8990c30b51808aa24e573").to_vec(),
         hex!("02e19838bff1d9").to_vec(),
         hex!("8dada6b9990cf61e4848af2a8656").to_vec(),
-        hex!("8da4ba025885462008fa0a4a6eb2").to_vec(),
         hex!("8da4ba025885462008fa0a4a6eb2").to_vec(),
         hex!("8da4ba0299115f301074a72db6ff").to_vec(),
     ]);
